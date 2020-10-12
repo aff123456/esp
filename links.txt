@@ -1,0 +1,15 @@
+upload de arquivos no ESP com SPIFFS:
+https://randomnerdtutorials.com/install-esp8266-filesystem-uploader-arduino-ide/
+
+https://tttapa.github.io/ESP8266/Chap11%20-%20SPIFFS.html
+
+
+web server com SPIFFS:
+https://randomnerdtutorials.com/esp8266-web-server-spiffs-nodemcu/
+
+https://tttapa.github.io/ESP8266/Chap12%20-%20Uploading%20to%20Server.html
+
+
+bibliotecas:
+https://github.com/me-no-dev/ESPAsyncWebServer
+https://github.com/me-no-dev/ESPAsyncTCP
