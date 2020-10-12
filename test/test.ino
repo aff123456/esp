@@ -1,23 +1,27 @@
-#include <ESP8266WiFi.h>    // biblioteca wifi
-
-const char* ssid = "WIFI_UNIFIQUE_624";         // ID da rede wi-fi existente
-const char* pass = "62451897";      // senha da rede wi-fi existente
-
+#include "FS.h"
+ 
 void setup() {
   Serial.begin(115200);
-  WiFi.mode(WIFI_STA);  
   
-  Serial.print("Conectando.");
-  WiFi.begin(ssid,pass);
-  while(WiFi.status() != WL_CONNECTED){
-    delay(1000);
-    Serial.print(".");
+  if(!SPIFFS.begin()){
+    Serial.println("An Error has occurred while mounting SPIFFS");
+    return;
   }
-  if(WiFi.status() == WL_CONNECTED) {
-    Serial.print("\nConectado!");
+  
+  File file = SPIFFS.open("/text.txt", "r");
+  if(!file){
+    Serial.println("Failed to open file for reading");
+    return;
   }
+  
+  Serial.println();
+  Serial.println("File Content:");
+  while(file.available()){
+    Serial.write(file.read());
+  }
+  file.close();
 }
-
+ 
 void loop() {
-  
+
 }
