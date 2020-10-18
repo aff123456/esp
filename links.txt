@@ -10,6 +10,9 @@ https://randomnerdtutorials.com/esp8266-web-server-spiffs-nodemcu/
 https://tttapa.github.io/ESP8266/Chap12%20-%20Uploading%20to%20Server.html
 
 
+autoconnect:
+https://hieromon.github.io/AutoConnect/index.html
+
 bibliotecas:
 https://github.com/me-no-dev/ESPAsyncWebServer
 https://github.com/me-no-dev/ESPAsyncTCP
