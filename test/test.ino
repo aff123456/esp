@@ -62,7 +62,6 @@ void listen() {
     serverIP = udp.remoteIP();
     Serial.print("IP server: ");
     Serial.println(serverIP);
-    digitalWrite(ledconfirma, HIGH);
     }
   udp.flush();
 }
