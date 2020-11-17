@@ -5,6 +5,8 @@
 ESP8266WebServer Server;          // Replace with WebServer for ESP32
 AutoConnect      Portal(Server);
 
+//int i = 0;
+
 void rootPage() {
   char content[] = "Hello, world";
   Server.send(200, "text/plain", content);
@@ -16,11 +18,14 @@ void setup() {
   Serial.println();
 
   Server.on("/", rootPage);
+  // codigo fica travado nesse if até o cliente conectar na rede do esp e configurar a rede do cliente no portal
   if (Portal.begin()) {
     Serial.println("WiFi connected: " + WiFi.localIP().toString());
   }
 }
 
 void loop() {
-    Portal.handleClient();
+  Portal.handleClient();
+  //Serial.println(i);
+  //i += 1;
 }
