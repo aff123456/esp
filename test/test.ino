@@ -51,7 +51,7 @@ void broadcast() {
   udp.write("pfg_ip_broadcast_cl");       // conteúdo do pacote
   int test = udp.endPacket();                        // pacote terminou de enviar
   Serial.println(test);
-  delay(25);                              // espera 25ms pra ver se tem resposta
+  delay(500);                              // espera 25ms pra ver se tem resposta
   listen();                               // checa pra ver se tem resposta
 }
 
