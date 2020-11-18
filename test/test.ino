@@ -8,6 +8,7 @@ WiFiUDP udp;              // cria um objeto da classe UDP
 IPAddress serverIP(255,255,255,255);
 IPAddress broadcastIP(255,255,255,255);
 int port = 5001;
+int i = 0;
 
 ESP8266WebServer Server;          // Replace with WebServer for ESP32
 AutoConnect      Portal(Server);
@@ -40,7 +41,10 @@ void setup() {
 void loop() {
   Portal.handleClient();
   // codigo loop
-  
+  Serial.print("loop ");
+  Serial.println(i);
+  i += 1;
+  delay(500);
 }
 
 // função que envia pacote e verifica se tem resposta do servidor
