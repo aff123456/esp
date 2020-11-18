@@ -47,9 +47,9 @@ void loop() {
 // função que envia pacote e verifica se tem resposta do servidor
 void broadcast() {
   Serial.println("começa a enviar");
-  int test = udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255
+  udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255
   udp.write("pfg_ip_broadcast_cl");       // conteúdo do pacote
-  udp.endPacket();                        // pacote terminou de enviar
+  int test = udp.endPacket();                        // pacote terminou de enviar
   Serial.println(test);
   delay(25);                              // espera 25ms pra ver se tem resposta
   listen();                               // checa pra ver se tem resposta
