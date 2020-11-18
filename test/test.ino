@@ -22,6 +22,8 @@ void setup() {
   Serial.begin(115200);
   Serial.println();
 
+  udp.begin(port);
+  
   Server.on("/", rootPage);
   // codigo fica travado nesse if até o cliente conectar na rede do esp e configurar a rede do cliente no portal
   if (Portal.begin()) {
@@ -45,9 +47,10 @@ void loop() {
 // função que envia pacote e verifica se tem resposta do servidor
 void broadcast() {
   Serial.println("começa a enviar");
-  udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255
+  int test = udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255
   udp.write("pfg_ip_broadcast_cl");       // conteúdo do pacote
   udp.endPacket();                        // pacote terminou de enviar
+  Serial.println(test);
   delay(25);                              // espera 25ms pra ver se tem resposta
   listen();                               // checa pra ver se tem resposta
 }
