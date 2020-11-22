@@ -16,7 +16,7 @@ server_address = ('', 5001)
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 sock.bind(server_address)
 
-response = 'pfg_ip_response_serv'
+response = '10'
 
 Handler = http.server.SimpleHTTPRequestHandler
 t = threading.Thread(target=socketserver.TCPServer(server_address, Handler).serve_forever)
