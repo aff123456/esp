@@ -70,6 +70,11 @@ void listen() {
     }
     Serial.print("Mensagem recebida: ");
     Serial.println(req);
+    types(req);
+    int a = req.toInt();
+    Serial.print("a: ");
+    Serial.println(a);
+    types(a);
     serverIP = udp.remoteIP();
     Serial.print("Server ip: ");
     Serial.println(serverIP);
@@ -78,3 +83,10 @@ void listen() {
     }
   udp.flush();
 }
+
+// serial print variable type
+void types(String a) { Serial.println("it's a String"); }
+void types(int a) { Serial.println("it's an int"); }
+void types(char *a) { Serial.println("it's a char*"); }
+void types(float a) { Serial.println("it's a float"); }
+void types(bool a) { Serial.println("it's a bool"); }
