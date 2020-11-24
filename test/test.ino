@@ -16,6 +16,14 @@ const char* pass = "62451897";
 bool flag_err = false;
 int err_cod = 0;
 
+String confirmation = "OK";
+String errmsg = "error";
+String notFound = "404";
+
+const int luz_1 = 1;
+const int luz_2 = 2;
+const int luz_3 = 3;
+
 /*
 ESP8266WebServer Server;          // Replace with WebServer for ESP32
 AutoConnect      Portal(Server);
@@ -72,11 +80,6 @@ void setup() {
 void loop() {
   // Portal.handleClient();
   listen(false);
-  if(flag_err) {
-    Serial.println();
-    Serial.print("Ocorreu um erro na execução do código. Erro:");
-    Serial.println(err_cod);
-  }
 }
 
 // função que envia pacote e verifica se tem resposta do servidor
@@ -110,44 +113,79 @@ void listen(bool config) {
       int a = req.toInt();
       Serial.print("Comando: ");
       Serial.println(a);
-      act(a);
+      filtrar(a);
     }
-  } else {
+  } else if(config) {
     Serial.println("Mensagem de retorno não recebida");
   }
   udp.flush();
 }
 
-void act(int comando) {
+void filtrar(int comando) {
   switch(comando) {
     case 0:
-      flag_err = true;
-      err_cod = 1;
+      // erro na mensagem recebida
+      Serial.println("Erro na mensagem recebida, verificar");
+      send(errmsg);
     break;
     case 1:
-      send("OK");
+      // mandar confirmação pra verificar se a conexão está ok
+      send(confirmation);
     break;
     case 101:
       // ligar a luz 01
+      atuar(luz_1,true);
+      send(confirmation);
     break;
     case 102:
       // ligar a luz 02
+      atuar(luz_2,true);
+      send(confirmation);
     break;
     case 103:
       // ligar a luz 03
+      atuar(luz_3,true);
+      send(confirmation);
     break;
     case 111:
       // desligar a luz 01
+      atuar(luz_1,false);
+      send(confirmation);
     break;
     case 112:
       // desligar a luz 02
+      atuar(luz_2,false);
+      send(confirmation);
     break;
     case 113:
       // desligar a luz 03
+      atuar(luz_3,false);
+      send(confirmation);
     break;
     default:
       // código não encontrado, verificar
+      Serial.println("Código não encontrado, verificar");
+      send(notFound);
     break;
+  }
+}
+
+void atuar(int porta, int sinal) {
+  /*
+  if(sinal) {
+    digitalWrite(porta, HIGH);
+  } else {
+    digitalWrite(porta, LOW);
+  }
+  */
+  if(sinal) {
+    Serial.print("luz ");
+    Serial.print(porta);
+    Serial.println(" ligada");
+  } else {
+    Serial.print("luz ");
+    Serial.print(porta);
+    Serial.println(" desligada");
   }
 }
 
@@ -155,7 +193,7 @@ void send(String mensagem) {
   Serial.print("Retorno enviado: ");
   Serial.println(mensagem);
   udp.beginPacket(serverIP, port);
-  udp.write("OK");
+  udp.print(mensagem);
   if(udp.endPacket() != 1) {
     Serial.println("Erro ao enviar a mensagem");
   }
