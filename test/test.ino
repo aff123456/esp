@@ -1,6 +1,6 @@
 #include <ESP8266WiFi.h>          // Replace with WiFi.h for ESP32
-//#include <ESP8266WebServer.h>     // Replace with WebServer.h for ESP32
-//#include <AutoConnect.h>
+#include <ESP8266WebServer.h>     // Replace with WebServer.h for ESP32
+#include <AutoConnect.h>
 #include <WiFiUdp.h>      // biblioteca udp
  
 WiFiUDP udp;              // cria um objeto da classe UDP
@@ -9,9 +9,6 @@ IPAddress serverIP(255,255,255,255);
 IPAddress broadcastIP(255,255,255,255);
 
 int port = 5001;
-
-const char* ssid = "WIFI_UNIFIQUE_624";
-const char* pass = "62451897";
 
 bool flag_err = false;
 int err_cod = 0;
@@ -24,7 +21,7 @@ const int luz_1 = 1;
 const int luz_2 = 2;
 const int luz_3 = 3;
 
-/*
+
 ESP8266WebServer Server;          // Replace with WebServer for ESP32
 AutoConnect      Portal(Server);
 
@@ -53,8 +50,8 @@ void setup() {
   }
   Serial.println("Servidor conectado, ip: " + serverIP.toString());
 }
-*/
 
+/*
 void setup() {
   delay(1000);
   Serial.begin(115200);
@@ -62,6 +59,9 @@ void setup() {
 
   udp.begin(port);
 
+  const char* ssid = "WIFI_UNIFIQUE_624";
+  const char* pass = "62451897";
+  
   Serial.print("Conectando.");
   WiFi.begin(ssid,pass);
   while(WiFi.status() != WL_CONNECTED){
@@ -76,9 +76,10 @@ void setup() {
   }
   Serial.println("Servidor conectado, ip: " + serverIP.toString());
 }
+*/
 
 void loop() {
-  // Portal.handleClient();
+  Portal.handleClient();
   listen(false);
 }
 
@@ -115,10 +116,10 @@ void listen(bool config) {
       Serial.println(a);
       filtrar(a);
     }
+    udp.flush();
   } else if(config) {
     Serial.println("Mensagem de retorno não recebida");
   }
-  udp.flush();
 }
 
 void filtrar(int comando) {
