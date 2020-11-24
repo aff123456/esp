@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang = "en">
+   <head></head>
+   <body>
+   <iframe name="dummyframe" id="dummyframe" style="display: none;"></iframe>
+
+      <h3>
+         <a href = "{{ url_for('index') }}">Clientes</a>
+      </h3>
+
+      <hr/>
+      {%- for message in get_flashed_messages() %}
+         {{ message }}
+      {%- endfor %}
+
+      <h3>Videos (<a href = "{{ url_for('show_all') }}">Show All
+         </a>)</h3>
+
+      <table>
+         <thead>
+            <tr>
+               <th>Id</th>
+               <th>Name</th>
+               <th>Views</th>
+               <th>Likes</th>
+            </tr>
+         </thead>
+
+         <tbody>
+
+               <tr>
+                  <td>{{ video.id }}</td>
+                  <td>{{ video.name }}</td>
+                  <td>{{ video.views }}</td>
+                  <td>{{ video.likes }}</td>
+               </tr>
+
+
+
+         </tbody>
+      </table>
+
+
+   <form action = "" method = "post" >
+         <label for = "name">Edit Name</label><br>
+         <input type = "text" name = "name" placeholder = {{ video.name }} /><br>
+         <input type = "submit" value = "Submit"  >
+      </form>
+
+   </body>
+</html>
