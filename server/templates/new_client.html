@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html lang = "en">
-   <head></head>
+   <head><meta http-equiv="refresh" content="5" ></head>
+
    <style>
-   html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 .img-icon{
  height: 20px;
@@ -52,7 +53,11 @@
       <h3>Clients (<a href = "{{ url_for('show_all') }}">Show All
          </a>)</h3>
 
-      <table>
+      <form action="" method="post">
+      <input type="submit" name="button" value="Search" />
+      </form>
+
+              <table>
          <thead>
             <tr>
                <th>Id</th>
@@ -60,36 +65,48 @@
                <th>Connected</th>
                <th>Function</th>
                <th>Value</th>
-
+               <th></th>
             </tr>
          </thead>
 
          <tbody>
-
+            {% for client in clients %}
                <tr>
                   <td>{{ client.id }}</td>
                   <td>{{ client.name }}</td>
                   <td>{{ client.connected }}</td>
                   <td>{{ client.function }}</td>
                   <td>{{ client.value }}</td>
-
+                  <td><form action="" method="post">
+                     <input type = "hidden" name = "id" value = {{ client.id }} />
+                     <input type = "hidden" name = "name" value = {{ client.name }} />
+                     <input type = "hidden" name = "connected" value = {{ client.connected }} />
+                     <input type = "hidden" name = "function" value = {{ client.function }} />
+                     <input type = "hidden" name = "value" value = {{ client.value }} />
+                     <input type="submit" name="button" value="Add Client" />
+                    </form></td>
                </tr>
-
-
-
+            {% endfor %}
          </tbody>
       </table>
-
-
-   <form action = "" method = "post" >
-         <label for = "name">Edit Name</label><br>
-         <input type = "text" name = "name" placeholder = {{ client.name }} /><br>
-         <input type = "submit" name = "button" value = "Edit"  >
+   <form action="" method="post">
+      <input type="submit" name="button" value="Stop Search" />
+      </form>
+   <form action="" method="post">
+      <input type="submit" name="button" value="Clear List" />
       </form>
 
-   <form action = "" method = "post" >
-         <input type = "submit" name = "button" value = "Delete Client"  >
-      </form>
 
+
+
+
+
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+ <script type="text/javascript">
+
+
+
+   </script>
    </body>
 </html>

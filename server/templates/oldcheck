@@ -1,0 +1,71 @@
+def check_thread(n):
+    print('UDP Socket running in thread')
+    sock = socket.socket(socket.AF_INET,  # Internet
+                         socket.SOCK_DGRAM)  # UDP
+    sock.bind(('', UDP_PORT))
+
+    response = 'pfg_ip_response_serv'
+
+
+    data, address = sock.recvfrom(4096)
+    data = str(data.decode('UTF-8'))
+    data_json = json.loads(data)
+    print(data_json["id"])
+
+
+    if data_json["id"]:
+        print('Client ip: ' + str(address[0]))
+        print(address)
+        print('responding...')
+        sent = sock.sendto(response.encode(), address)
+        print('Sent confirmation back')
+        client = new_clients(id=data_json["id"], name=data_json["name"], connected=bool(data_json["connected"]),
+                                 function=data_json["function"], value=int(data_json["value"]))
+        db.session.add(client)
+        db.session.commit()
+
+    print('UDP Socket stopped running in thread')
+
+
+
+
+
+
+ #include <ArduinoJson.h>
+
+void setup() {
+  // Initialize Serial port
+  Serial.begin(9600);
+  while (!Serial) continue;
+
+  // Allocate the JSON document
+  //
+  // Inside the brackets, 200 is the RAM allocated to this document.
+  // Don't forget to change this value to match your requirement.
+  // Use arduinojson.org/v6/assistant to compute the capacity.
+  StaticJsonDocument<200> doc;
+
+  // StaticJsonObject allocates memory on the stack, it can be
+  // replaced by DynamicJsonDocument which allocates in the heap.
+  //
+  // DynamicJsonDocument  doc(200);
+
+  // Add values in the document
+  //
+  doc["id"] = 45;
+  doc["name"] = "Esp_Luz_45";
+  doc["connected"] = 0;
+  doc["function"] = "Luz";
+  doc["value"] = 1;
+
+
+
+  // Generate the minified JSON and send it to the Serial port.
+  //
+  serializeJson(doc, Serial);
+  // The above line prints:
+  // {"id":45,"name":"Esp_Luz_45","connected":0,"function":"Luz","value":1}
+
+
+
+}

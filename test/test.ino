@@ -2,6 +2,7 @@
 #include <ESP8266WebServer.h>     // Replace with WebServer.h for ESP32
 #include <AutoConnect.h>
 #include <WiFiUdp.h>      // biblioteca udp
+#include <ArduinoJson.h>
  
 WiFiUDP udp;              // cria um objeto da classe UDP
 
@@ -37,6 +38,16 @@ void setup() {
   Serial.println();
 
   udp.begin(port);
+
+  StaticJsonDocument<200> doc;
+  doc["id"] = 45;
+  doc["name"] = "Esp_Luz_45";
+  doc["connected"] = 0;
+  doc["function"] = "Luz";
+  doc["value"] = 1;
+  String response;
+  serializeJson(doc, response);
+  Serial.println(response);
   
   Server.on("/", rootPage);
   // codigo fica travado nesse if até o cliente conectar na rede do esp e configurar a rede do cliente no portal
@@ -45,8 +56,8 @@ void setup() {
   }
   // serverIP == broadcastIP quer dizer que o cliente não sabe o IP do servidor
   while(serverIP == broadcastIP) {
-    broadcast();    // manda um pacote e vê se tem resposta
-    delay(500);     // espera 500ms pra uma nova tentativa
+    broadcast(response);    // manda um pacote e vê se tem resposta
+    delay(2500);            // espera pra uma nova tentativa
   }
   Serial.println("Servidor conectado, ip: " + serverIP.toString());
 }
@@ -84,14 +95,14 @@ void loop() {
 }
 
 // função que envia pacote e verifica se tem resposta do servidor
-void broadcast() {
+void broadcast(String mensagem) {
   //Serial.println("começa a enviar");
-  String mensagem = "pfg_ip_broadcast_cl";
+  //String mensagem = "pfg_ip_broadcast_cl";
   udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255
   udp.print(mensagem);       // conteúdo do pacote
   int test = udp.endPacket();             // pacote terminou de enviar
-  Serial.println(test);
-  delay(500);                             // espera 500ms pra ver se tem resposta
+  //Serial.println(test);
+  delay(2500);                            // espera pra ver se tem resposta
   listen(true);                           // checa pra ver se tem resposta
 }
 

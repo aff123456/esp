@@ -1,10 +1,47 @@
 <!DOCTYPE html>
 <html lang = "en">
-   <head></head>
+   <head><meta http-equiv="refresh" content="5" ></head>
+      <style>
+   html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+
+.img-icon{
+ height: 20px;
+ width: 20px;
+}
+#logo{
+ height: 30px;
+}
+#logo-black{
+ height: 20px;
+}
+#logo-footer{
+ height: 50px;
+}
+#sobre-titulo{
+				font-size:30px;
+				text-align: center;
+            }
+			#sobre-texto{
+				font-size:15px;
+				padding-left:5%;
+				text-align: justify;
+            }
+			#sobre-figura{
+				float: right;
+				padding-right:5%;
+				padding-left:20px;
+				width: 40%;
+.bottom {
+                position:absolute;
+                bottom:0;
+                left:0;
+            }
+</style>
+
    <body>
 
       <h3>
-         <a href = "{{ url_for('index') }}">Clientes</a>
+         <a href = "{{ url_for('index') }}">Projeto Sem Nome</a>
       </h3>
 
       <hr/>
@@ -12,7 +49,7 @@
          {{ message }}
       {%- endfor %}
 
-      <h3>Videos (<a href = "{{ url_for('show_all') }}">Add Video
+      <h3>Clients (<a href = "{{ url_for('new_client') }}">Add client
          </a>)</h3>
 
       <table>
@@ -20,20 +57,22 @@
             <tr>
                <th>Id</th>
                <th>Name</th>
-               <th>Views</th>
-               <th>Likes</th>
+               <th>Connected</th>
+               <th>Function</th>
+               <th>Value</th>
                <th>Edit</th>
             </tr>
          </thead>
 
          <tbody>
-            {% for video in videos %}
+            {% for client in clients %}
                <tr>
-                  <td>{{ video.id }}</td>
-                  <td>{{ video.name }}</td>
-                  <td>{{ video.views }}</td>
-                  <td>{{ video.likes }}</td>
-                  <td><a href = "{{ url_for('show_one', video_id=video.id) }}">See More</a></td>
+                  <td>{{ client.id }}</td>
+                  <td>{{ client.name }}</td>
+                  <td>{{ client.connected }}</td>
+                  <td>{{ client.function }}</td>
+                  <td>{{ client.value }}</td>
+                  <td><a href = "{{ url_for('show_one', client_id=client.id) }}">See More</a></td>
                </tr>
             {% endfor %}
          </tbody>
