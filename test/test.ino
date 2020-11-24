@@ -40,16 +40,17 @@ void setup() {
 void loop() {
   Portal.handleClient();
   // codigo loop
-  listen();
+  // listen();
 }
 
 // função que envia pacote e verifica se tem resposta do servidor
 void broadcast() {
   //Serial.println("começa a enviar");
+  String mensagem = "pfg_ip_broadcast_cl";
   udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255
-  udp.write("pfg_ip_broadcast_cl");       // conteúdo do pacote
+  udp.print(mensagem);       // conteúdo do pacote
   int test = udp.endPacket();             // pacote terminou de enviar
-  //Serial.println(test);
+  Serial.println(test);
   delay(500);                             // espera 500ms pra ver se tem resposta
   listen();                               // checa pra ver se tem resposta
 }
