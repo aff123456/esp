@@ -130,7 +130,7 @@ void listen(bool config) {
     }
     udp.flush();
   } else if(config) {
-    Serial.println("Mensagem de retorno não recebida");
+    Serial.println("Esperando busca");
   }
 }
 
