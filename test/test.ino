@@ -42,9 +42,9 @@ void setup() {
   StaticJsonDocument<200> doc;
   doc["id"] = 45;
   doc["name"] = "Esp_Luz_45";
-  doc["connected"] = 0;
+  doc["ip"] = 0;
+  doc["ip2"] = 1;
   doc["function"] = "Luz";
-  doc["value"] = 1;
   String response;
   serializeJson(doc, response);
   Serial.println(response);
