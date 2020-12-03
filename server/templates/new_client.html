@@ -1,8 +1,16 @@
 <!DOCTYPE html>
-<html lang = "en">
-   <head><meta http-equiv="refresh" content="5" ></head>
+<html>
+<title>Projeto Especializado</title>
+<link rel="shortcut icon" type="image/x-icon" href="https://image.flaticon.com/icons/png/512/25/25706.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript"> (function() { var css = document.createElement('link'); css.href = 'https://use.fontawesome.com/releases/v5.1.0/css/all.css'; css.rel = 'stylesheet'; css.type = 'text/css'; document.getElementsByTagName('head')[0].appendChild(css); })(); </script>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
-   <style>
+<style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 .img-icon{
@@ -38,75 +46,233 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
                 left:0;
             }
 </style>
+<body class="w3-light-grey">
 
-   <body>
+<!-- Top container -->
+<div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
+  <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
+  <span class="w3-bar-item w3-right"><i class="fa fa-power-off"></i></span>
+</div>
 
-      <h3>
-         <a href = "{{ url_for('index') }}">Projeto Sem Nome</a>
-      </h3>
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-collapse w3-white w3-animate-left w3-white" style="z-index:3;width:300px;" id="mySidebar"><br>
 
-      <hr/>
-      {%- for message in get_flashed_messages() %}
-         {{ message }}
-      {%- endfor %}
+  <hr>
 
-      <h3>Clients (<a href = "{{ url_for('show_all') }}">Show All
-         </a>)</h3>
+  <div class="w3-bar-block">
+		<a href="{{ url_for('new_client') }}" class="w3-bar-item w3-button w3-padding" onclick="w3_close();" ><i class="fa fa-plus fa-fw"></i> Adicionar Cliente</a>
+        <a class="w3-bar-item w3-button w3-padding" onclick="abretroca();" ><i class="fa fa-list fa-fw"></i> Lista de Clientes</a>
+		<div id="escolha" align="center" class="w3-light-grey" style="display:none;">
+			<div class="w3-container w3-light-grey w3-padding"></div>
+			<select onchange="location = this.value;" name="goid" class="w3-select" style="font-size:15px; text-align:center;">
+            <option value="" selected disabled hidden>Escolha um</option>
+                {% for client in clients %}
+			<option value = "{{ url_for('show_one', client_id=client.id) }}">{{ client.name }}</option>
+                {% endfor %}
+            </select>
+			<div class="w3-container w3-light-grey w3-padding-small"></div>
 
-      <form action="" method="post">
-      <input type="submit" name="button" value="Search" />
-      </form>
 
+		</div>
+		<hr>
+
+
+  </div>
+  </div>
+  <div class="w3-container w3-padding-16 w3-white">
+  <h4 style="text-align:center;"><i class="fa fa-power-off w3-xxxlarge"></i></h4>
+  </div>
+
+</nav>
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:20px;">
+
+  <!-- Header -->
+  <header class="w3-container" style="padding-top:25px">
+      <h5><b><a href = "{{ url_for('index') }}"style="text-decoration: none"><i class="fa fa-power-off"></i> Minha Rede</a></b></h5>
+  </header>
+
+  <div class="w3-row-padding w3-margin-bottom">
+
+
+      <div class="w3-container w3-teal w3-padding-16 w3-round-xlarge">
+        <div class="w3-left">
+            <h2>
+                Novos Clientes
+            </h2>
+
+        </div>
+        <div class="w3-right"><i class="fa fa-search w3-xxxlarge"></i></div>
+        <div class="w3-clear"></div>
+        <div class="w3-container w3-light-grey w3-padding-small"></div>
+
+
+
+
+
+         <div class="w3-container w3-padding">
+
+         {% if newclients %}
               <table>
          <thead>
             <tr>
+               <th>Nome</th>
+               <th>Função</th>
                <th>Id</th>
-               <th>Name</th>
-               <th>Connected</th>
-               <th>Function</th>
-               <th>Value</th>
-               <th></th>
+               <th>Ip</th>
+               <th> </th>
             </tr>
          </thead>
 
          <tbody>
-            {% for client in clients %}
+            {% for newclient in newclients %}
                <tr>
-                  <td>{{ client.id }}</td>
-                  <td>{{ client.name }}</td>
-                  <td>{{ client.connected }}</td>
-                  <td>{{ client.function }}</td>
-                  <td>{{ client.value }}</td>
+                  <td>{{ newclient.name }}</td>
+                  <td>{{ newclient.function }}</td>
+                  <td>{{ newclient.id }}</td>
+                  <td>{{ newclient.ip }}</td>
                   <td><form action="" method="post">
-                     <input type = "hidden" name = "id" value = {{ client.id }} />
-                     <input type = "hidden" name = "name" value = {{ client.name }} />
-                     <input type = "hidden" name = "connected" value = {{ client.connected }} />
-                     <input type = "hidden" name = "function" value = {{ client.function }} />
-                     <input type = "hidden" name = "value" value = {{ client.value }} />
-                     <input type="submit" name="button" value="Add Client" />
+                     <input type = "hidden" name = "id" value = {{ newclient.id }} />
+                     <input type = "hidden" name = "ip" value = {{ newclient.ip }} />
+                     <input type = "hidden" name = "ip2" value = {{ newclient.ip2 }} />
+                     <input type = "hidden" name = "name" value = {{ newclient.name }} />
+                     <input type = "hidden" name = "connected" value = {{ newclient.connected }} />
+                     <input type = "hidden" name = "function" value = {{ newclient.function }} />
+                     <input type = "hidden" name = "value" value = {{ newclient.value }} />
+                     <input type = "hidden" name="button" value="Add Client" />
+                     <button type = "submit" class="w3-button w3-light-grey w3-round-large" style="padding: 8px"><i class="fa fa-plus fa-fw" style="margin-right: 8px"></i>Add</button>
                     </form></td>
                </tr>
             {% endfor %}
          </tbody>
       </table>
-   <form action="" method="post">
-      <input type="submit" name="button" value="Stop Search" />
-      </form>
-   <form action="" method="post">
-      <input type="submit" name="button" value="Clear List" />
-      </form>
+             {% endif %}
+             </div>
+
+          <div class="w3-container w3-light-grey w3-padding-small"></div>
+          <div class="w3-container w3-padding"></div>
+
+
+        <div class="w3-clear"></div>
+
+      <div class="w3-left">
+        <form action="" method="post">
+            <input type = "hidden" name = "button" value = "Search" />
+            <button type = "submit" class="w3-button w3-light-grey w3-round-large" style="padding: 8px"><i class="fa fa-search-plus fa-fw" style="margin-right: 8px"></i>Procurar Clientes</button>
+        </form>
+      </div>
+      <div class="w3-right">
+        <form action="" method="post">
+            <input type = "hidden" name="button" value="Stop Search" />
+            <button type = "submit" class="w3-button w3-light-grey w3-round-large" style="padding: 8px; "><i class="fa fa-search-minus fa-fw" style="margin-right: 8px"></i>Parar Procura</button>
+        </form>
+      </div>
+      <div class="w3-clear"></div>
+      <div class="w3-container w3-padding"></div>
+      <div class="w3-left">
+         {% if searching %}
+            <i class='fa fa-spinner fa-spin  w3-xxlarge w3-text-dark-gray' style="margin-left: 56px"></i>
+         {% endif %}
+         {%- for message in get_flashed_messages() %}
+            {% if not searching %}
+                <a style="margin-left: 8px">{{ message }}</a>
+            {% endif %}
+         {%- endfor %}
+
+      </div>
+      <div class="w3-right">
+        <form action="" method="post">
+            <input type = "hidden" name="button" value="Clear List" />
+            <button type = "submit" class="w3-button w3-light-grey w3-round-large" style="padding: 8px"><i class="fa fa-trash fa-fw" style="margin-right: 8px"></i>Limpar Lista</button>
+           </form>
+      </div>
+
+      </div>
+
+
+  </div>
 
 
 
+  <br>
+  <div class="w3-container w3-dark-grey w3-padding-32">
+    <div class="w3-row">
+		<div id="sobre">
+			<h6>copyright eu 2020</h6>
+		</div>
+    </div>
+  </div>
 
+  <!-- Footer -->
+  <footer class="w3-container w3-padding-16 w3-light-grey">
+    <h4 style="text-align:center;"><i class="fa fa-power-off w3-xxxlarge"></i></h4>
+  </footer>
 
-
-
+  <!-- End page content -->
+</div>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
  <script type="text/javascript">
 
 
 
-   </script>
-   </body>
+
+
+
+		$(document).ready(function() {
+
+
+		});
+
+
+
+
+
+
+
+
+// Get the Sidebar
+var mySidebar = document.getElementById("mySidebar");
+
+// Get the DIV with overlay effect
+var overlayBg = document.getElementById("myOverlay");
+
+// Toggle between showing and hiding the sidebar, and add overlay effect
+function w3_open() {
+  if (mySidebar.style.display === 'block') {
+    mySidebar.style.display = 'none';
+    overlayBg.style.display = "none";
+  } else {
+    mySidebar.style.display = 'block';
+    overlayBg.style.display = "block";
+  }
+}
+
+// Close the sidebar with the close button
+function w3_close() {
+  mySidebar.style.display = "none";
+  overlayBg.style.display = "none";
+}
+
+function fechatroca() {
+  escolha.style.display = "none";
+}
+
+function abretroca() {
+  if (escolha.style.display === 'block') {
+    escolha.style.display = 'none';
+  } else {
+    escolha.style.display = 'block';
+  }
+}
+
+
+
+</script>
+
+</body>
 </html>

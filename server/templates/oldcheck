@@ -1,71 +1,230 @@
-def check_thread(n):
-    print('UDP Socket running in thread')
-    sock = socket.socket(socket.AF_INET,  # Internet
-                         socket.SOCK_DGRAM)  # UDP
-    sock.bind(('', UDP_PORT))
+<!DOCTYPE html>
+<html lang = "en">
+   <head></head>
+   <style>
+   html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
-    response = 'pfg_ip_response_serv'
-
-
-    data, address = sock.recvfrom(4096)
-    data = str(data.decode('UTF-8'))
-    data_json = json.loads(data)
-    print(data_json["id"])
-
-
-    if data_json["id"]:
-        print('Client ip: ' + str(address[0]))
-        print(address)
-        print('responding...')
-        sent = sock.sendto(response.encode(), address)
-        print('Sent confirmation back')
-        client = new_clients(id=data_json["id"], name=data_json["name"], connected=bool(data_json["connected"]),
-                                 function=data_json["function"], value=int(data_json["value"]))
-        db.session.add(client)
-        db.session.commit()
-
-    print('UDP Socket stopped running in thread')
-
-
-
-
-
-
- #include <ArduinoJson.h>
-
-void setup() {
-  // Initialize Serial port
-  Serial.begin(9600);
-  while (!Serial) continue;
-
-  // Allocate the JSON document
-  //
-  // Inside the brackets, 200 is the RAM allocated to this document.
-  // Don't forget to change this value to match your requirement.
-  // Use arduinojson.org/v6/assistant to compute the capacity.
-  StaticJsonDocument<200> doc;
-
-  // StaticJsonObject allocates memory on the stack, it can be
-  // replaced by DynamicJsonDocument which allocates in the heap.
-  //
-  // DynamicJsonDocument  doc(200);
-
-  // Add values in the document
-  //
-  doc["id"] = 45;
-  doc["name"] = "Esp_Luz_45";
-  doc["connected"] = 0;
-  doc["function"] = "Luz";
-  doc["value"] = 1;
-
-
-
-  // Generate the minified JSON and send it to the Serial port.
-  //
-  serializeJson(doc, Serial);
-  // The above line prints:
-  // {"id":45,"name":"Esp_Luz_45","connected":0,"function":"Luz","value":1}
-
-
-
+.img-icon{
+ height: 20px;
+ width: 20px;
 }
+#logo{
+ height: 30px;
+}
+#logo-black{
+ height: 20px;
+}
+#logo-footer{
+ height: 50px;
+}
+#sobre-titulo{
+				font-size:30px;
+				text-align: center;
+            }
+			#sobre-texto{
+				font-size:15px;
+				padding-left:5%;
+				text-align: justify;
+            }
+			#sobre-figura{
+				float: right;
+				padding-right:5%;
+				padding-left:20px;
+				width: 40%;
+.bottom {
+                position:absolute;
+                bottom:0;
+                left:0;
+            }
+</style>
+
+   <body>
+
+      <h3>
+         <a href = "{{ url_for('index') }}">Projeto Sem Nome</a>
+      </h3>
+
+      <hr/>
+      {%- for message in get_flashed_messages() %}
+         {{ message }}
+      {%- endfor %}
+
+      <h3>Clients (<a href = "{{ url_for('show_all') }}">Show All
+         </a>)</h3>
+
+      <table>
+         <thead>
+            <tr>
+               <th>Id</th>
+               <th>Ip</th>
+               <th>Name</th>
+               <th>Connected</th>
+               <th>Function</th>
+               <th>Value</th>
+
+            </tr>
+         </thead>
+
+         <tbody>
+
+               <tr>
+                  <td>{{ client.id }}</td>
+                  <td>{{ client.ip }}</td>
+                  <td>{{ client.name }}</td>
+                  <td>{{ client.connected }}</td>
+                  <td>{{ client.function }}</td>
+                  <td>{{ client.value }}</td>
+
+               </tr>
+
+
+
+         </tbody>
+      </table>
+
+
+      <form action = "" method = "post" >
+         <label for = "name">Edit Name</label><br>
+         <input type = "text" name = "name" placeholder = {{ client.name }} /><br>
+         <input type = "submit" name = "button" value = "Edit"  >
+      </form>
+
+      <form action = "" method = "post" >
+         <input type = "submit" name = "button" value = "Delete Client"  >
+      </form>
+
+      <form action = "" method = "post" >
+         <label for = "name">Enviar Codigo Para ESP</label><br>
+         <input type = "text" name = "codigo" placeholder = "codigo" /><br>
+         <input type = "hidden" name = "ip" value = {{ client.ip }} />
+         <input type = "hidden" name = "ip2" value = {{ client.ip2 }} />
+         <input type = "submit" name = "button" value = "Enviar Código"  >
+      </form>
+
+   </body>
+</html>
+
+
+
+
+
+
+
+
+____________________________________
+
+
+<!DOCTYPE html>
+<html lang = "en">
+   <head><meta http-equiv="refresh" content="5" ></head>
+
+   <style>
+html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+
+.img-icon{
+ height: 20px;
+ width: 20px;
+}
+#logo{
+ height: 30px;
+}
+#logo-black{
+ height: 20px;
+}
+#logo-footer{
+ height: 50px;
+}
+#sobre-titulo{
+				font-size:30px;
+				text-align: center;
+            }
+			#sobre-texto{
+				font-size:15px;
+				padding-left:5%;
+				text-align: justify;
+            }
+			#sobre-figura{
+				float: right;
+				padding-right:5%;
+				padding-left:20px;
+				width: 40%;
+.bottom {
+                position:absolute;
+                bottom:0;
+                left:0;
+            }
+</style>
+
+   <body>
+
+      <h3>
+         <a href = "{{ url_for('index') }}">Projeto Sem Nome</a>
+      </h3>
+
+      <hr/>
+      {%- for message in get_flashed_messages() %}
+         {{ message }}
+      {%- endfor %}
+
+      <h3>Clients (<a href = "{{ url_for('show_all') }}">Show All
+         </a>)</h3>
+
+      <form action="" method="post">
+      <input type="submit" name="button" value="Search" />
+      </form>
+
+              <table>
+         <thead>
+            <tr>
+               <th>Id</th>
+               <th>Name</th>
+               <th>Connected</th>
+               <th>Function</th>
+               <th>Value</th>
+               <th></th>
+            </tr>
+         </thead>
+
+         <tbody>
+            {% for newclient in newclients %}
+               <tr>
+                  <td>{{ newclient.id }}</td>
+                  <td>{{ newclient.name }}</td>
+                  <td>{{ newclient.connected }}</td>
+                  <td>{{ newclient.function }}</td>
+                  <td>{{ newclient.value }}</td>
+                  <td><form action="" method="post">
+                     <input type = "hidden" name = "id" value = {{ newclient.id }} />
+                     <input type = "hidden" name = "ip" value = {{ newclient.ip }} />
+                     <input type = "hidden" name = "ip2" value = {{ newclient.ip2 }} />
+                     <input type = "hidden" name = "name" value = {{ newclient.name }} />
+                     <input type = "hidden" name = "connected" value = {{ newclient.connected }} />
+                     <input type = "hidden" name = "function" value = {{ newclient.function }} />
+                     <input type = "hidden" name = "value" value = {{ newclient.value }} />
+                     <input type="submit" name="button" value="Add Client" />
+                    </form></td>
+               </tr>
+            {% endfor %}
+         </tbody>
+      </table>
+   <form action="" method="post">
+      <input type="submit" name="button" value="Stop Search" />
+      </form>
+   <form action="" method="post">
+      <input type="submit" name="button" value="Clear List" />
+      </form>
+
+
+
+
+
+
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+ <script type="text/javascript">
+
+
+
+   </script>
+   </body>
+</html>

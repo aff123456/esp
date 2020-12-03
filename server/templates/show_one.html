@@ -1,8 +1,17 @@
 <!DOCTYPE html>
-<html lang = "en">
-   <head></head>
-   <style>
-   html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
+<html>
+<title>Projeto Especializado</title>
+<link rel="shortcut icon" type="image/x-icon" href="https://image.flaticon.com/icons/png/512/25/25706.png">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript"> (function() { var css = document.createElement('link'); css.href = 'https://use.fontawesome.com/releases/v5.1.0/css/all.css'; css.rel = 'stylesheet'; css.type = 'text/css'; document.getElementsByTagName('head')[0].appendChild(css); })(); </script>
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<style>
+html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 .img-icon{
  height: 20px;
@@ -37,59 +46,329 @@
                 left:0;
             }
 </style>
+<body class="w3-light-grey">
 
-   <body>
+<!-- Top container -->
+<div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
+  <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
+  <span class="w3-bar-item w3-right"><i class="fa fa-power-off"></i></span>
+</div>
 
-      <h3>
-         <a href = "{{ url_for('index') }}">Projeto Sem Nome</a>
-      </h3>
+<!-- Sidebar/menu -->
+<nav class="w3-sidebar w3-collapse w3-white w3-animate-left w3-white" style="z-index:3;width:300px;" id="mySidebar"><br>
 
-      <hr/>
-      {%- for message in get_flashed_messages() %}
-         {{ message }}
-      {%- endfor %}
+  <hr>
 
-      <h3>Clients (<a href = "{{ url_for('show_all') }}">Show All
-         </a>)</h3>
+  <div class="w3-bar-block">
+		<a href="{{ url_for('new_client') }}" class="w3-bar-item w3-button w3-padding" onclick="w3_close();" ><i class="fa fa-plus fa-fw"></i> Adicionar Cliente</a>
+        <a class="w3-bar-item w3-button w3-padding" onclick="abretroca();" ><i class="fa fa-list fa-fw"></i> Lista de Clientes</a>
+		<div id="escolha" align="center" class="w3-light-grey" style="display:none;">
+			<div class="w3-container w3-light-grey w3-padding"></div>
+			<select onchange="location = this.value;" name="goid" class="w3-select" style="font-size:15px; text-align:center;">
+            <option value="" selected disabled hidden>Escolha um</option>
+                {% for client in clients %}
+			<option value = "{{ url_for('show_one', client_id=client.id) }}">{{ client.name }}</option>
+                {% endfor %}
+            </select>
+			<div class="w3-container w3-light-grey w3-padding-small"></div>
 
+
+		</div>
+		<hr>
+
+
+  </div>
+  </div>
+  <div class="w3-container w3-padding-16 w3-white">
+  <h4 style="text-align:center;"><i class="fa fa-power-off w3-xxxlarge"></i></h4>
+  </div>
+
+</nav>
+
+
+<!-- Overlay effect when opening sidebar on small screens -->
+<div class="w3-overlay w3-hide-large w3-animate-opacity" onclick="w3_close()" style="cursor:pointer" title="close side menu" id="myOverlay"></div>
+
+
+<!-- !PAGE CONTENT! -->
+<div class="w3-main" style="margin-left:300px;margin-top:20px;">
+
+  <!-- Header -->
+  <header class="w3-container" style="padding-top:25px">
+      <h5><b><a href = "{{ url_for('index') }}"style="text-decoration: none"><i class="fa fa-power-off"></i> Minha Rede</a></b></h5>
+  </header>
+
+  <div class="w3-row-padding w3-margin-bottom">
+
+
+      {% if client.connected%}
+        <div class="w3-container w3-teal w3-padding-16 w3-round-xlarge">
+      {% else %}
+        <div class="w3-container w3-blue-gray w3-padding-16 w3-round-xlarge">
+      {% endif %}
+        <div class="w3-left">
+          <h2>
+            {{ client.name }}
+          </h2>
+        </div>
+        {% if client.function == "Luz" %}
+          <div class="w3-right"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
+        {% elif client.function == "Portao" %}
+          <div class="w3-right"><i class="fas fa-door-open w3-xxxlarge"></i></div>
+        {% elif client.function == "Ar" %}
+          <div class="w3-right"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+        {% else %}
+          <div class="w3-right"><i class="fa fa-power-off w3-xxxlarge"></i></div>
+        {% endif %}
+          <div class="w3-right" style="margin-right: 20px">
+            {% if client.connected%}
+                <i class="material-icons w3-xxxlarge">signal_wifi_4_bar</i>
+            {% else %}
+                <i class="material-icons w3-xxxlarge w3-text-dark-gray">signal_wifi_off</i>
+            {% endif %}
+        </div>
+        <div class="w3-clear"></div>
+          <div class="w3-container w3-light-grey w3-padding-small"></div>
+              <div class="w3-container w3-padding">
       <table>
          <thead>
             <tr>
-               <th>Id</th>
-               <th>Name</th>
-               <th>Connected</th>
-               <th>Function</th>
-               <th>Value</th>
-
+               <th>Nome</th>
+               <th>Função</th>
+               <th>Valor</th>
             </tr>
          </thead>
-
          <tbody>
-
                <tr>
-                  <td>{{ client.id }}</td>
                   <td>{{ client.name }}</td>
-                  <td>{{ client.connected }}</td>
                   <td>{{ client.function }}</td>
                   <td>{{ client.value }}</td>
-
                </tr>
+         <div class="w3-right">
+             <br>
+                <a class="w3-circle" onclick="abreinfo();" style="padding: 8px"><i class="fa fa-plus fa-fw"></i></a>
+                    </div>
+         </tbody>
+      </table>
+          </div>
+          <div class="w3-container w3-light-grey w3-padding-small"></div>
+        <div class="w3-clear"></div>
+<div id="info" style="display:none;">
 
-
+    <div class="w3-container w3-padding">
+      <table>
+         <thead>
+            <tr>
+               <th>ID</th>
+               <th>IP</th>
+               <th>IP2</th>
+               <th>Conexão</th>
+            </tr>
+         </thead>
+         <tbody>
+               <tr>
+                  <td>{{ client.id }}</td>
+                  <td>{{ client.ip }}</td>
+                  <td>{{ client.ip2 }}</td>
+                  <td>{{ client.connected }}</td>
+               </tr>
 
          </tbody>
       </table>
+          </div>
+
+          <div class="w3-light-grey w3-padding-small"></div>
+</div>
+    <div class="w3-padding"></div>
+
+          <div class="w3-clear"></div>
+            <div id="botoes" align="center" style="display:none;">
+                <div class="w3-bar">
+                    {% if client.function == "Luz" %}
+                    <a class="w3-button w3-light-grey w3-round-large" onclick="ligaluz();" style="padding: 8px"><i class="far fa-lightbulb fa-fw"style="margin-right: 8px"></i>Ligar</a>
+                    <a class="w3-button w3-light-grey w3-round-large" onclick="apagaluz();" style="padding: 8px"><i class="fas fa-lightbulb fa-fw"style="margin-right: 8px"></i>Desligar</a>
+                    {% elif client.function == "Portao" %}
+                    <a class="w3-button w3-light-grey w3-round-large" onclick="ligaluz();" style="padding: 8px"><i class="fas fa-door-open fa-fw"style="margin-right: 8px"></i>Abrir</a>
+                    <a class="w3-button w3-light-grey w3-round-large" onclick="apagaluz();" style="padding: 8px"><i class="fas fa-door-closed fa-fw "style="margin-right: 8px"></i>Fechar</a>
+                    {% elif client.function == "Ar" %}
+                    {% else %}
+                    {% endif %}
+                    <div class="w3-padding"></div>
+                </div>
+            </div>
+          <div id="editar" align="left" style="display:none;">
+            <form action = "" method = "post" >
+                <label>Editar nome do cliente</label><br>
+              <div class="w3-left">
+                <input  class="w3-input w3-round-large" type = "text" name = "name" placeholder = {{ client.name }} /><br>
+                <input type = "hidden" name = "button" value = "Edit" />
+              </div>
+              <div class="w3-left">
+                <input type = "submit" value = "Editar"  class="w3-button w3-light-grey w3-round-large" style="margin-left: 8px">
+              </div>
+            </form>
+          </div>
 
 
-   <form action = "" method = "post" >
-         <label for = "name">Edit Name</label><br>
-         <input type = "text" name = "name" placeholder = {{ client.name }} /><br>
-         <input type = "submit" name = "button" value = "Edit"  >
+    <div class="w3-clear"></div>
+
+
+          <div id="envia" align="left" style="display:none;">
+      <form action = "" method = "post" >
+         <label>Enviar código para cliente</label><br>
+         <div class="w3-left">
+            <input class="w3-input w3-round-large" type = "text" name = "codigo" placeholder = "Código"/><br>
+            <input type = "hidden" name = "ip" value = {{ client.ip }} />
+            <input type = "hidden" name = "ip2" value = {{ client.ip2 }} />
+            <input type = "hidden" name = "button" value = "Enviar Código" />
+          </div>
+          <div class="w3-left">
+            <input type = "submit"  value = "Enviar" class="w3-button w3-light-grey w3-round-large" style="margin-left: 8px" >
+          </div>
       </form>
+          </div>
+          <div class="w3-clear"></div>
 
-   <form action = "" method = "post" >
-         <input type = "submit" name = "button" value = "Delete Client"  >
-      </form>
+          <div class="w3-left">
+            <a class="w3-button w3-light-grey w3-round-large" onclick="abreeditar();" style="padding: 8px"><i class="fa fa-pencil fa-fw" style="margin-right: 8px"></i>Editar Nome</a>
+          </div>
+          <div class="w3-right">
+            <a class="w3-button w3-light-grey w3-round-large" onclick="abrebotoes();" style="padding: 8px;"><i class="fas fa-wrench fa-fw" style="margin-right: 8px"></i>Interagir</a>
+          </div>
+          <div class="w3-clear"></div>
+          <div class=" w3-padding"></div>
+          <div class="w3-left">
+            {%- for message in get_flashed_messages() %}
+                <a style="margin-left: 8px">{{ message }}</a>
+            {%- endfor %}
+            <!--<a class="w3-button w3-light-grey w3-round-large " onclick="abreenvia(); " style="padding: 8px"><i class="fa fa-send fa-fw"style=" margin-right: 8px"></i>Enviar Código</a>!-->
+          </div>
+          <div class="w3-right">
+            <form action = "" method = "post">
+                <input type = "hidden" name = "button" value = "Delete Client" />
+                <button type = "submit" class="w3-button w3-light-grey w3-round-large" style="padding: 8px"><i class="fa fa-trash fa-fw" style="margin-right: 8px"></i><a>Deletar</a></button>
+            </form>
+         </div>
 
-   </body>
+
+
+      </div>
+
+
+
+  </div>
+
+
+
+  <br>
+  <div class="w3-container w3-dark-grey w3-padding-32">
+    <div class="w3-row">
+		<div id="sobre">
+			<h6>copyright eu 2020</h6>
+		</div>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w3-container w3-padding-16 w3-light-grey">
+    <h4 style="text-align:center;"><i class="fa fa-power-off w3-xxxlarge"></i></h4>
+  </footer>
+
+  <!-- End page content -->
+</div>
+</div>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+ <script type="text/javascript">
+
+
+
+
+
+
+		$(document).ready(function() {
+
+
+
+		    // check for new updates
+		    setInterval('getUpdates()',3000);
+
+		});
+
+
+
+
+
+
+
+
+// Get the Sidebar
+var mySidebar = document.getElementById("mySidebar");
+
+// Get the DIV with overlay effect
+var overlayBg = document.getElementById("myOverlay");
+
+// Toggle between showing and hiding the sidebar, and add overlay effect
+function w3_open() {
+  if (mySidebar.style.display === 'block') {
+    mySidebar.style.display = 'none';
+    overlayBg.style.display = "none";
+  } else {
+    mySidebar.style.display = 'block';
+    overlayBg.style.display = "block";
+  }
+}
+
+// Close the sidebar with the close button
+function w3_close() {
+  mySidebar.style.display = "none";
+  overlayBg.style.display = "none";
+}
+
+function fechatroca() {
+  escolha.style.display = "none";
+}
+
+function abretroca() {
+  if (escolha.style.display === 'block') {
+    escolha.style.display = 'none';
+  } else {
+    escolha.style.display = 'block';
+  }
+}
+
+function abreenvia() {
+  if (envia.style.display === 'block') {
+    envia.style.display = 'none';
+  } else {
+    envia.style.display = 'block';
+  }
+}
+
+function abreeditar() {
+  if (editar.style.display === 'block') {
+    editar.style.display = 'none';
+  } else {
+    editar.style.display = 'block';
+  }
+}
+
+function abreinfo() {
+  if (info.style.display === 'block') {
+    info.style.display = 'none';
+  } else {
+    info.style.display = 'block';
+  }
+}
+function abrebotoes() {
+  if (botoes.style.display === 'block') {
+    botoes.style.display = 'none';
+  } else {
+    botoes.style.display = 'block';
+  }
+}
+
+
+</script>
+
+</body>
 </html>

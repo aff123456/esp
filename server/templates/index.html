@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
-<title>iOrta</title>
-<link rel="shortcut icon" type="image/x-icon" href="https://i.imgur.com/Um4EQz3.png">
+<title>Projeto Especializado</title>
+<link rel="shortcut icon" type="image/x-icon" href="https://image.flaticon.com/icons/png/512/25/25706.png">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript"> (function() { var css = document.createElement('link'); css.href = 'https://use.fontawesome.com/releases/v5.1.0/css/all.css'; css.rel = 'stylesheet'; css.type = 'text/css'; document.getElementsByTagName('head')[0].appendChild(css); })(); </script>
 <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
@@ -41,14 +44,16 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
                 position:absolute;                  
                 bottom:0;                          
                 left:0;                          
-            } 
+            }
+
+
 </style>
 <body class="w3-light-grey">
 
 <!-- Top container -->
 <div class="w3-bar w3-top w3-black w3-large" style="z-index:4">
   <button class="w3-bar-item w3-button w3-hide-large w3-hover-none w3-hover-text-light-grey" onclick="w3_open();"><i class="fa fa-bars"></i>  Menu</button>
-  <span class="w3-bar-item w3-right"><img id="logo" src="https://i.imgur.com/iRosApa.png"></span>
+  <span class="w3-bar-item w3-right"><i class="fa fa-power-off"></i></span>
 </div>
 
 <!-- Sidebar/menu -->
@@ -57,42 +62,27 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   <hr>
 
   <div class="w3-bar-block">
-		<a class="w3-bar-item w3-button w3-padding" onclick="abretroca();" ><i class="fa fa-leaf fa-fw"></i> Trocar Planta</a>
+		<a href="{{ url_for('new_client') }}" class="w3-bar-item w3-button w3-padding" onclick="w3_close();" ><i class="fa fa-plus fa-fw"></i> Adicionar Cliente</a>
+        <a class="w3-bar-item w3-button w3-padding" onclick="abretroca();" ><i class="fa fa-list fa-fw"></i> Lista de Clientes</a>
 		<div id="escolha" align="center" class="w3-light-grey" style="display:none;">
-			<br>
-			<select name="planta" class="w3-select" style="font-size:25px; text-align:center;">
-			<option value ="0">Nenhuma</option>
-			<option value ="1">Alecrim</option>
-			<option value ="2">Anturio</option>
-			<option value ="3">Asplênio</option>
-			<option value ="4">Azaleia</option>
-			<option value ="5">Boca-de-Leão</option>
-			<option value ="6">Cactos</option>
-			<option value ="7">Cebolinha</option>
-			<option value ="8">Dália</option>
-			<option value ="9">Hortelã</option>
-			<option value ="10">Jade</option>
-			<option value ="11">Lança de São Jorge</option>
-			<option value ="12">Lírio</option>
-			<option value ="13">Orégano</option>
-			<option value ="14">Salsinha</option>
-			<option value ="15">Violeta</option>
-			<option value ="16">Violeta-africana</option>	
-			</select> 
-			<br>
-			<br>
-			<a class="w3-bar-item w3-button w3-padding w3-white" onclick="troca(); fechatroca();" style="text-align:center;" >Escolher</a>
-			<br>
+			<div class="w3-container w3-light-grey w3-padding"></div>
+			<select onchange="location = this.value;" name="goid" class="w3-select" style="font-size:15px; text-align:center;">
+            <option value="" selected disabled hidden>Escolha um</option>
+                {% for client in clients %}
+			<option value = "{{ url_for('show_one', client_id=client.id) }}">{{ client.name }}</option>
+                {% endfor %}
+            </select>
+			<div class="w3-container w3-light-grey w3-padding-small"></div>
+
+
 		</div>
-		<a class="w3-bar-item w3-button w3-padding" onclick="começa(); w3_close();" ><i class="fa fa-power-off fa-fw"></i> ON/OFF</a>
-		<a href="#sobre" class="w3-bar-item w3-button w3-padding" onclick="w3_close();" ><i class="fa fa-list fa-fw"></i> Sobre a planta</a>
 		<hr>
 		
 		
   </div>
   </div>
   <div class="w3-container w3-padding-16 w3-white">
-  <h4 style="text-align:center;"><img id="logo-footer" src="https://i.imgur.com/ZQOGkT0.png"></h4>
+  <h4 style="text-align:center;"><i class="fa fa-power-off w3-xxxlarge"></i></h4>
   </div>
 
 </nav>
@@ -107,66 +97,78 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
   <!-- Header -->
   <header class="w3-container" style="padding-top:25px">
-    <h5><b><img id="logo-black" src="https://i.imgur.com/Fkvh77M.png"> Minha Horta</b></h5>
+      <h5><b><a href = "{{ url_for('index') }}"style="text-decoration: none"><i class="fa fa-power-off"></i> Minha Rede</b></h5></a>
   </header>
 
   <div class="w3-row-padding w3-margin-bottom">
+      {% for client in clients %}
     <div class="w3-quarter">
-      <div class="w3-container w3-red w3-padding-16">
-        <div class="w3-left"><i class="fa fa-power-off w3-xxxlarge"></i></div>
+         <a href = "{{ url_for('show_one', client_id=client.id) }}"style="text-decoration: none">
+      {% if client.connected%}
+        <div class="w3-container w3-teal w3-padding-16 w3-round-xlarge">
+      {% else %}
+        <div class="w3-container w3-blue-gray w3-padding-16 w3-round-xlarge">
+      {% endif %}
+        {% if client.function == "Luz" %}
+          <div class="w3-left"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
+        {% elif client.function == "Portao" %}
+          <div class="w3-left"><i class="fas fa-door-open w3-xxxlarge"></i></div>
+        {% elif client.function == "Ar" %}
+          <div class="w3-left"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+        {% else %}
+          <div class="w3-left"><i class="fa fa-power-off w3-xxxlarge" ></i></div>
+        {% endif %}
         <div class="w3-right">
-		<h3  id="onoff"></h3>
+		    <h3>{{ client.name }} </h3>
         </div>
         <div class="w3-clear"></div>
-        <h4>Estado</h4>
-      </div>
-    </div>
-    <div class="w3-quarter">
-      <div class="w3-container w3-teal w3-padding-16">
-        <div class="w3-left"><i class="fa fa-leaf	 w3-xxxlarge"></i></div>
-        <div class="w3-right">
-        <h3  id="plantaescolhida"></h3>  
+          <div class="w3-left">
+            {% if client.function == "Ar"%}
+                <h3>{{ client.value }}°C </h3>
+            {% elif client.function == "Luz"%}
+                {% if client.value %}
+                    <h3>On</h3>
+                {% else %}
+                    <h3>Off</h3>
+                {% endif %}
+            {% elif client.function == "Portao"%}
+                {% if client.value %}
+                    <h3>Fechado</h3>
+                {% else %}
+                    <h3>Aberto</h3>
+                {% endif %}
+            {% else %}
+                <h3>See More </h3>
+            {% endif %}
         </div>
-        <div class="w3-clear"></div>
-        <h4>Planta</h4>
-      </div>
-    </div>
-    <div class="w3-quarter">
-      <div class="w3-container w3-blue w3-padding-16">
-        <div class="w3-left"><i class="fa fa-flask w3-xxxlarge"></i></div>
         <div class="w3-right">
-		<h3  id="nivel"></h3>
+            {% if client.connected%}
+                <i class="material-icons w3-xxlarge">signal_wifi_4_bar</i>
+            {% else %}
+                <i class="material-icons w3-xxlarge  w3-text-dark-gray">signal_wifi_off</i>
+            {% endif %}
         </div>
-        <div class="w3-clear"></div>
-        <h4>Reservatório</h4>
+          <div class="w3-clear"></div>
       </div>
+            </a>
+      <div class="w3-container w3-light-grey w3-padding-small"></div>
     </div>
-    <div class="w3-quarter">
-      <div class="w3-container w3-orange w3-text-white w3-padding-16">
-        <div class="w3-left"><i class="fa fa-sun-o w3-xxxlarge"></i></div>
-        <div class="w3-right">
-          <h3  id="luz"></h3> 
-        </div>
-        <div class="w3-clear"></div>
-        <h4>Luminosidade</h4>
-      </div>
-    </div>
+
+    {% endfor %}
   </div>
 
   <br>
   <div class="w3-container w3-dark-grey w3-padding-32">
     <div class="w3-row">
 		<div id="sobre">
-			<div id="sobre-titulo"></div>
-			<img id="sobre-figura" src="https://i.imgur.com/Um4EQz3.png">
-			<div id="sobre-texto"></div>
+			<h6>copyright eu 2020</h6>
 		</div>
     </div>
   </div>
 
   <!-- Footer -->
   <footer class="w3-container w3-padding-16 w3-light-grey">
-    <h4 style="text-align:center;"><img id="logo-footer" src="https://i.imgur.com/ZQOGkT0.png"></h4>
+    <h4 style="text-align:center;"><i class="fa fa-power-off w3-xxxlarge "></i></h4>
   </footer>
 
   <!-- End page content -->
@@ -174,24 +176,15 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
  <script type="text/javascript">
 		
+
 		
-		
-		var plantaS;
-		var onoff;
-		
-		$.getJSON('http://api.thingspeak.com/channels/798291/feed/last.json?callback', function(data) {
-				
-				onoff=data.field1;				
-				plantas=data.field2;
-					
-						
-			});
-		
+
+		var idgo;
 
 		
 		$(document).ready(function() {
 
-		    getUpdates();
+
 
 		    // check for new updates
 		    setInterval('getUpdates()',3000);
@@ -199,185 +192,9 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 		});
 			
 
-		
-		function getUpdates() {
 
-			// get the data with a webservice call
-			
 
-			$.getJSON('http://api.thingspeak.com/channels/798291/feed/last.json?callback', function(data) {
-						
-						if(data.field1 == 0){
-							document.getElementById("onoff").innerHTML = "OFF";
-						}else{
-							document.getElementById("onoff").innerHTML = "ON";
-						}						
-						plantaS=data.field2;
-						switch(data.field2){
-						case '0': 
-							document.getElementById("plantaescolhida").innerHTML = "Nenhuma";
-							document.getElementById("sobre-titulo").innerHTML = "Nenhuma";
-							document.getElementById("sobre-texto").innerHTML = "Escolha uma planta.";
-							document.getElementById("luz").innerHTML = "Nenhuma";
-							document.getElementById('sobre-figura').src="https://i.imgur.com/Um4EQz3.png";
-							break;
-						case '1': 
-							document.getElementById("plantaescolhida").innerHTML = "Alecrim";
-							document.getElementById("sobre-titulo").innerHTML = "Alecrim";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação intensa e direta, adubação orgânica leve, não deixar em locais úmidos.";
-							document.getElementById('sobre-figura').src="https://www.aromaticasvivas.com/imgs/produtos/gd_alecrim.jpg";
-							break;
-						case '2': 
-							document.getElementById("plantaescolhida").innerHTML = "Antúrio";
-							document.getElementById("sobre-titulo").innerHTML = "Antúrio";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação indireta e fraca, sem contato com raios solares diretos. Adubação orgânica.";
-							document.getElementById('sobre-figura').src="http://flores.culturamix.com/blog/wp-content/gallery/anturio-2/200.405_anturio_vermelho_pt_17.jpg";
-							break;
-						case '3': 
-							document.getElementById("plantaescolhida").innerHTML = "Asplênio";
-							document.getElementById("sobre-titulo").innerHTML = "Asplênio";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Pelo menos duas horas de luz indireta por dia, mensalmente usar adubo liquido NPK.";
-							document.getElementById('sobre-figura').src="http://www.veiling.com.br/uploads/produtos_catalogo/asplenioosakacrespo.jpeg";
-							break;
-						case '4': 
-							document.getElementById("plantaescolhida").innerHTML = "Azaleia";
-							document.getElementById("sobre-titulo").innerHTML = "Azaleia";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação intensa e direta, adubação orgânica.";
-							document.getElementById('sobre-figura').src="https://savegnago.vteximg.com.br/arquivos/ids/272331-1000-1000/figura-1frente.jpg";
-							break;
-						case '5': 
-							document.getElementById("plantaescolhida").innerHTML = "Boca-de-Leão";
-							document.getElementById("sobre-titulo").innerHTML = "Boca-de-Leão";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação intensa e direta, adubação com fósforo e potássio.";
-							document.getElementById('sobre-figura').src="https://foundit.vteximg.com.br/arquivos/ids/157167-1000-1000/buque_de_flores_boca_de_leao_branca.jpg";
-							break;
-						case '6': 
-							document.getElementById("plantaescolhida").innerHTML = "Cactos";
-							document.getElementById("sobre-titulo").innerHTML = "Cactos";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação intensa e direta, não necessita de adubação.";
-							document.getElementById('sobre-figura').src="https://t1.uc.ltmcdn.com/pt/images/8/0/9/como_plantar_cacto_candelabro_21908_600.jpg";
-							break;
-						case '7': 
-							document.getElementById("plantaescolhida").innerHTML = "Cebolinha";
-							document.getElementById("sobre-titulo").innerHTML = "Cebolinha";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação intensa e direta, adubação orgânica.";
-							document.getElementById('sobre-figura').src="https://www.seeds-gallery.shop/6708-medium_default/sementes-de-cebolinha.jpg";
-							break;
-						case '8': 
-							document.getElementById("plantaescolhida").innerHTML = "Dália";
-							document.getElementById("sobre-titulo").innerHTML = "Dália";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação intensa e direta, adubação com fósforo e potássio.";
-							document.getElementById('sobre-figura').src="https://flores.culturamix.com/blog/wp-content/gallery/como-plantar-dalia-em-vaso-3/Como-Plantar-D%C3%A1lia-Em-Vaso-6.jpg";
-							break;
-						case '9': 
-							document.getElementById("plantaescolhida").innerHTML = "Hortelã";
-							document.getElementById("sobre-titulo").innerHTML = "Hortelã";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação intensa e direta, adubação orgânicaleve, evitar sol intenso em climas quentes.";
-							document.getElementById('sobre-figura').src="https://mercachefe.pt/pt/joiadocampo/1778-big_default/vaso-hortel%C3%A3-jvv.jpg";
-							break;
-						case '10': 
-							document.getElementById("plantaescolhida").innerHTML = "Jade";
-							document.getElementById("sobre-titulo").innerHTML = "Jade";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação indireta, adubação orgânica leve.";
-							document.getElementById('sobre-figura').src="http://lojavirtual.cidadejardimplantas.com.br/media/catalog/product/cache/1/image/800x600/040ec09b1e35df139433887a97daa66f/b/a/balsamo-3.jpg";
-							break;
-						case '11': 
-							document.getElementById("plantaescolhida").innerHTML = "Lança de São Jorge";
-							document.getElementById("sobre-titulo").innerHTML = "Lança de São Jorge";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação direta, adubação orgânica com baixo hidrogênio.";
-							document.getElementById('sobre-figura').src="https://static3.tcdn.com.br/img/img_prod/350075/muda_de_suculenta_lanca_de_sao_jorge_11cm_10135_1_20190521161842.jpg";
-							break;
-						case '12': 
-							document.getElementById("plantaescolhida").innerHTML = "Lírio";
-							document.getElementById("sobre-titulo").innerHTML = "Lírio";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação indireta, após inverno, adubar com fertilizante orgânico e NPK rico em fósforo.";
-							document.getElementById('sobre-figura').src="https://savegnago.vteximg.com.br/arquivos/ids/274724-1000-1000/figura-1frente.jpg";
-							break;
-						case '13': 
-							document.getElementById("plantaescolhida").innerHTML = "Orégano";
-							document.getElementById("sobre-titulo").innerHTML = "Orégano";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação intensa e direta, 1/3 solo argiloso, 1/3 areia média, 1/3 adubo orgânico.";
-							document.getElementById('sobre-figura').src="http://subastas.ec/media/items/5/598/598_orig.jpg";
-							break;
-						case '14': 
-							document.getElementById("plantaescolhida").innerHTML = "Salsinha";
-							document.getElementById("sobre-titulo").innerHTML = "Salsinha";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação intensa e direta, adubação orgânica leve.";
-							document.getElementById('sobre-figura').src="https://bs.simplusmedia.com/i/730/7891/salsinha.jpg";
-							break;
-						case '15': 
-							document.getElementById("plantaescolhida").innerHTML = "Violeta";
-							document.getElementById("sobre-titulo").innerHTML = "Violeta";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação indireta e fraca, sem contato com raios solares diretos, adubação orgânica.";
-							document.getElementById('sobre-figura').src="https://static.giulianaflores.com.br/images/product/25163gg.jpg";
-							break;1
-						case '16': 
-							document.getElementById("plantaescolhida").innerHTML = "Violeta-africana";
-							document.getElementById("sobre-titulo").innerHTML = "Violeta-africana";
-							document.getElementById("sobre-texto").innerHTML = "Recomendações: Iluminação indireta e fraca, sem contato com raios solares diretos, adubação orgânica, temperatuas amenas entre 18 e 24 graus.";
-							document.getElementById('sobre-figura').src="https://verdecora.es/48046-large_default/violeta-africana-maceta-12-cm.jpg";
-							break;
-						}
-						
-						
-			});
-			
-			$.getJSON('http://api.thingspeak.com/channels/783934/feed/last.json?callback', function(data) {
 
-						if(data.field1 == 0){
-							document.getElementById("nivel").innerHTML = "Reabastecer";
-						}else{
-							document.getElementById("nivel").innerHTML = "OK";
-						}						
-						if(plantas != 0){
-						switch(data.field2){
-						case '0':
-							document.getElementById("luz").innerHTML = "Adequada";
-							break;
-						case '1':
-							document.getElementById("luz").innerHTML = "Muita";
-							break;
-						case '-1':
-							document.getElementById("luz").innerHTML = "Pouca";
-							break;
-						}
-						}
-			});
-
-		}
-		
-		
-		
-		function troca(){
-			 plantaS = document.getElementsByName("planta")[0].value;
-			 if(plantaS ==0){
-				onoff=0;
-			 }
-			 
-			 var HttpAgent = new XMLHttpRequest();
-			 var URI = "http://api.thingspeak.com/update?key=AR7T13CDUEPFWWQ1&field1=" + onoff + "&field2=" + plantaS;
-
-			 HttpAgent.open("POST", URI);
-			 HttpAgent.send(); 
-   		}
-		
-		function começa() {
-			 if (onoff == 0 && plantaS != 0){
-				 onoff = 1;
-			 }else{
-				 onoff = 0;
-			 }
-			 
-			 var HttpAgent = new XMLHttpRequest();
-			 var URI = "http://api.thingspeak.com/update?key=AR7T13CDUEPFWWQ1&field1=" + onoff + "&field2=" + plantaS;
-
-			 HttpAgent.open("POST", URI);
-			 HttpAgent.send(); 
-
-		}
-		
-
-	getUpdates();
 
 
 // Get the Sidebar
@@ -414,6 +231,7 @@ function abretroca() {
     escolha.style.display = 'block';
   }
 }
+
 
 
 

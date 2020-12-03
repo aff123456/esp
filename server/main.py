@@ -60,29 +60,34 @@ class check_thread(threading.Thread):
                 print('responding...')
                 sent = sock.sendto(response.encode(), address)
                 print('Sent confirmation back')
-                client = new_clients(id=data_json["id"], name=data_json["name"], connected=bool(data_json["connected"]),
-                                     function=data_json["function"], value=int(data_json["value"]))
-                try:
-                    db.session.add(client)
-                    db.session.commit()
-                except:
-                    print("An exception occurred")
-            time.sleep(1)
-            self.__flag.clear()  # Set to False to block the thread
+                result = new_clients.query.filter_by(id=data_json['id']).first()
+                if not result:
+                    client = new_clients(id=data_json["id"],ip = str(address[0]), ip2 = address[1], name=data_json["name"],\
+                            connected=bool(data_json["connected"]), function=data_json["function"], value=int(data_json["value"]))
+                    try:
+                        db.session.add(client)
+                        db.session.commit()
+                    except:
+                        print("An exception occurred")
+                else:
+                    print('Client already on the list')
+            if not self.__flag.isSet():
+                print('UDP Socket stopped searching')
+
 
     def pause(self):
         self.__flag.clear() # Set to False to block the thread
-        print('UDP Socket stopped running in thread')
 
     def resume(self):
         self.__flag.set() # Set to True, let the thread stop blocking
-        print('UDP Socket running in thread')
+        print('UDP Socket is searching')
 
     def stop(self):
         self.__flag.set() # Resume the thread from the suspended state, if it is already suspended
         self.__running.clear() # Set to False
 
-
+    def get_flag(self):
+        return self.__flag.isSet()
 
 
 
@@ -90,6 +95,8 @@ class check_thread(threading.Thread):
 
 class clients(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(20), primary_key=True)
+    ip2 = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     connected = db.Column(db.Boolean)
     function = db.Column(db.String(100))
@@ -97,13 +104,17 @@ class clients(db.Model):
 
 class new_clients(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(20), primary_key=True)
+    ip2 = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
     connected = db.Column(db.Boolean)
     function = db.Column(db.String(100))
     value = db.Column(db.Integer)
 
-def __init__(self, name, connected, function,value):
+def __init__(self, name, ip, ip2, connected, function,value):
    self.name = name
+   self.ip = ip
+   self.ip2 = ip2
    self.connected = connected
    self.function = function
    self.value = value
@@ -113,9 +124,12 @@ db.create_all()
 
 client_put_args = reqparse.RequestParser()
 client_put_args.add_argument("name", type=str, help="Name of the client is required", required=True)
-client_put_args.add_argument("connected", type=bool, help="Views of the client is required", required=True)
+client_put_args.add_argument("connected", type=int, help="Views of the client is required", required=True)
 client_put_args.add_argument("function", type=str, help="Views of the client is required", required=True)
 client_put_args.add_argument("value", type=int, help="Likes on the client is required", required=True)
+client_put_args.add_argument("ip", type=str, help="Likes on the client is required", required=True)
+client_put_args.add_argument("ip2", type=int, help="Likes on the client is required", required=True)
+
 
 client_update_args = reqparse.RequestParser()
 client_update_args.add_argument("name", type=str)
@@ -126,9 +140,11 @@ client_update_args.add_argument("value", type=int)
 resource_fields = {
     'id': fields.Integer,
     'name': fields.String,
-    'connected': fields.Boolean,
+    'connected': fields.Integer,
     'function': fields.String,
-    'value': fields.Integer
+    'value': fields.Integer,
+    'ip': fields.String,
+    'ip2': fields.Integer
 }
 
 
@@ -146,7 +162,7 @@ class Client(Resource):
         result = clients.query.filter_by(id=client_id).first()
         if result:
             abort(409, message="Client id taken...")
-        client = clients(id=client_id, name=args['name'], connected=args['connected'], function=args['function'], value=args['value'])
+        client = clients(id=client_id, name=args['name'], ip=args['ip'], ip2=args['ip2'], connected=args['connected'], function=args['function'], value=args['value'])
         db.session.add(client)
         db.session.commit()
         return client, 201
@@ -196,7 +212,7 @@ def handle_message(message):
 
 @app.route("/")
 def index():
-  return render_template('index.html')
+  return render_template('index.html', clients = clients.query.order_by(clients.id).all() )
 
 @app.route('/show_all', methods = ['GET', 'POST'])
 def show_all():
@@ -219,36 +235,49 @@ def show_one(client_id):
     if request.method == 'POST':
         if request.form['button'] == "Edit":
             if not request.form['name']:
-                flash('Please enter a new name', 'error')
+                flash('Digite um novo nome.', 'error')
             else:
                 result = clients.query.filter_by(id=client_id).first()
                 result.name = request.form['name']
                 db.session.commit()
-                flash('Record was successfully added')
-        else:
+                flash('Nome foi alterado.')
+        elif request.form['button'] == "Delete Client":
             db.session.delete(clients.query.filter_by(id=client_id).first())
             db.session.commit()
-            return redirect(url_for('show_all'))
-    return render_template('show_one.html', client = clients.query.filter_by(id=client_id).first())
+            return redirect(url_for('index'))
+        else:
+            if not request.form['codigo']:
+                flash('Digite um código.', 'error')
+            else:
+
+                codigo = request.form['codigo']
+                sock = socket.socket(socket.AF_INET,  # Internet
+                                     socket.SOCK_DGRAM)  # UDP
+
+                sent = sock.sendto(codigo.encode(), (request.form['ip'], int(request.form['ip2'])))
+
+                flash('Código enviado.')
+    return render_template('show_one.html', client = clients.query.filter_by(id=client_id).first(), clients = clients.query.order_by(clients.id).all())
 
 @app.route('/new_client/', methods = ['GET', 'POST'])
 def new_client():
     if request.method == 'POST':
         if request.form['button'] == "Search":
             thread.resume()
-            flash('Searching')
+            #flash('Procurando.')
         elif request.form['button'] == "Stop Search":
 
             thread.pause()
-            flash('Stopped Searching')
+            #flash('Parou de procurar.')
 
         elif request.form['button'] == "Clear List":
             db.session.query(new_clients).delete()
             db.session.commit()
+            flash('Lista foi limpa.')
         else:
             result = clients.query.filter_by(id=request.form['id']).first()
             if not result:
-                client = clients(id=request.form['id'], name=request.form['name'], connected=bool(request.form['connected']),
+                client = clients(id=request.form['id'], ip=request.form['ip'], ip2=request.form['ip2'], name=request.form['name'], connected=bool(request.form['connected']),
                              function=request.form['function'], value=request.form['value'])
                 db.session.add(client)
                 db.session.commit()
@@ -257,14 +286,16 @@ def new_client():
                 db.session.delete(new_clients.query.filter_by(id=request.form['id']).first())
                 db.session.commit()
 
-                flash('Client was successfully added')
+                flash('Cliente foi adicionado.')
+
             else:
-                flash('Id already exists')
+                flash('Id já existente.')
+
 
             thread.pause()
 
             #return redirect(url_for('show_all'))
-    return render_template('new_client.html', clients=new_clients.query.order_by(new_clients.id).all())
+    return render_template('new_client.html', newclients=new_clients.query.order_by(new_clients.id).all() , clients = clients.query.order_by(clients.id).all(), searching = thread.get_flag())
 
 
 
