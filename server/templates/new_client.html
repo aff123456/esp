@@ -115,7 +115,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 
 
-         <div class="w3-container w3-padding">
+         <div id="dados" class="w3-container w3-padding">
 
          {% if newclients %}
               <table style="text-align:center;">
@@ -229,11 +229,16 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 
 
+console.log("a");
+ $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    $(document).ready(function() {
+        $.get( $SCRIPT_ROOT + '/update/new' , function(data){
+                 $("#dados").html(data);
+            }
+        );
 
-		$(document).ready(function() {
-
-
-		});
+        setTimeout(arguments.callee, 1000);
+	});
 
 
 

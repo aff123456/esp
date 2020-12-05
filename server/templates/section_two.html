@@ -1,0 +1,24 @@
+<table style="text-align:center;">
+         <thead>
+            <tr>
+               <th>ID</th>
+               <th>IP</th>
+               <th>IP2</th>
+               <th>Conexão</th>
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+                <td id="client_id">{{ client.id }} </td>
+                <td>{{ client.ip }}</td>
+                <td>{{ client.ip2 }}</td>
+                {% if client.connected %}
+                    <td>Conectado</td>
+                {% else %}
+                    <td>Desconectado</td>
+                {% endif %}
+
+            </tr>
+
+         </tbody>
+      </table>

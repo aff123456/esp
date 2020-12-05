@@ -1,0 +1,83 @@
+
+        {% if client.function == "Luz" %}
+            {% if client.action %}
+                <div class="w3-right"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
+            {% else %}
+                <div class="w3-right w3-text-dark-gray"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
+            {% endif %}
+        {% elif client.function == "Porta" %}
+          {% if client.value%}
+            <div class="w3-right"><i class="fas fa-door-closed w3-xxxlarge"></i></div>
+          {% else %}
+            <div class="w3-right"><i class="fas fa-door-open w3-xxxlarge"></i></div>
+          {% endif %}
+        {% elif client.function == "Ar" %}
+          {% if client.action %}
+                <div class="w3-right"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+            {% else %}
+                <div class="w3-right w3-text-dark-gray"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+            {% endif %}
+        {% else %}
+          <div class="w3-right"><i class="fa fa-power-off w3-xxxlarge"></i></div>
+        {% endif %}
+          <div class="w3-right" style="margin-right: 20px">
+            {% if client.connected%}
+                <i class="material-icons w3-xxxlarge">signal_wifi_4_bar</i>
+            {% else %}
+                <i class="material-icons w3-xxxlarge w3-text-dark-gray">signal_wifi_off</i>
+            {% endif %}
+        </div>
+        <div class="w3-clear"></div>
+          <div class="w3-container w3-light-grey w3-padding-small"></div>
+              <div class="w3-container w3-padding">
+      <table style="text-align:center;">
+         <thead>
+            <tr>
+                <th>Nome</th>
+                <th>Função</th>
+                {% if client.function == "Ar"%}
+                    <th>Temp</th>
+                    <th>Ligado</th>
+                {% elif client.function == "Porta" %}
+                    <th>Fechada</th>
+                {% elif client.function == "Luz" %}
+                    <th>Ligado</th>
+                {% endif %}
+
+            </tr>
+         </thead>
+         <tbody>
+            <tr>
+                <td>{{ client.name }}</td>
+                <td>{{ client.function }}</td>
+                {% if client.function == "Ar"%}
+                    <td id=value>{{ client.value }}°C</td>
+                    {% if client.action%}
+                        <td>Sim</td>
+                    {% else %}
+                        <td>Não</td>
+                    {% endif %}
+                {% elif client.function == "Porta" %}
+                    {% if client.value%}
+                        <td>Sim</td>
+                    {% else %}
+                        <td>Não</td>
+                    {% endif %}
+                {% elif client.function == "Luz" %}
+                    {% if client.action%}
+                        <td>Sim</td>
+                    {% else %}
+                        <td>Não</td>
+                    {% endif %}
+                {% endif %}
+
+
+            </tr>
+         <div class="w3-right">
+             <br>
+                <a class="w3-circle" onclick="abreinfo();" style="padding: 8px"><i class="fa fa-plus fa-fw"></i></a>
+                    </div>
+         </tbody>
+      </table >
+          </div>
+

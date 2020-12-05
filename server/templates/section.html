@@ -1,0 +1,66 @@
+      {% for client in clients %}
+    <div class="w3-quarter">
+         <a href = "{{ url_for('show_one', client_id=client.id) }}"style="text-decoration: none">
+      {% if client.connected%}
+        <div class="w3-container w3-teal w3-padding-16 w3-round-xlarge">
+      {% else %}
+        <div class="w3-container w3-blue-gray w3-padding-16 w3-round-xlarge">
+      {% endif %}
+        {% if client.function == "Luz" %}
+            {% if client.action %}
+                <div class="w3-left"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
+            {% else %}
+                <div class="w3-left w3-text-dark-gray"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
+            {% endif %}
+        {% elif client.function == "Porta" %}
+          {% if client.value%}
+            <div class="w3-left"><i class="fas fa-door-closed w3-xxxlarge"></i></div>
+          {% else %}
+            <div class="w3-left"><i class="fas fa-door-open w3-xxxlarge"></i></div>
+          {% endif %}
+        {% elif client.function == "Ar" %}
+            {% if client.action %}
+                <div class="w3-left"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+            {% else %}
+                <div class="w3-left w3-text-dark-gray"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+            {% endif %}
+        {% else %}
+          <div class="w3-left"><i class="fa fa-power-off w3-xxxlarge" ></i></div>
+        {% endif %}
+        <div class="w3-right">
+		    <h4>{{ client.name }} </h4>
+        </div>
+        <div class="w3-clear"></div>
+          <div class="w3-left">
+            {% if client.function == "Ar"%}
+                <h3>{{ client.value }}°C </h3>
+            {% elif client.function == "Luz"%}
+                {% if client.action %}
+                    <h3>Ligada</h3>
+                {% else %}
+                    <h3>Desligada</h3>
+                {% endif %}
+            {% elif client.function == "Porta"%}
+                {% if client.value %}
+                    <h3>Fechada</h3>
+                {% else %}
+                    <h3>Aberta</h3>
+                {% endif %}
+            {% else %}
+                <h3>See More </h3>
+            {% endif %}
+        </div>
+        <div class="w3-right">
+            {% if client.connected%}
+                <i class="material-icons w3-xxlarge">signal_wifi_4_bar</i>
+            {% else %}
+                <i class="material-icons w3-xxlarge  w3-text-dark-gray">signal_wifi_off</i>
+            {% endif %}
+        </div>
+          <div class="w3-clear"></div>
+      </div>
+            </a>
+      <div class="w3-container w3-light-grey w3-padding-small"></div>
+    </div>
+
+    {% endfor %}

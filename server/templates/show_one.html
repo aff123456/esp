@@ -10,6 +10,8 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 
+
+
 <style>
 html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
@@ -105,15 +107,17 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
 
       {% if client.connected%}
-        <div class="w3-container w3-teal w3-padding-16 w3-round-xlarge">
+        <div id = "cor" class="w3-container w3-teal w3-padding-16 w3-round-xlarge">
       {% else %}
-        <div class="w3-container w3-blue-gray w3-padding-16 w3-round-xlarge">
+        <div id = "cor" class="w3-container w3-blue-gray w3-padding-16 w3-round-xlarge">
       {% endif %}
+
         <div class="w3-left">
           <h2>
             {{ client.name }}
           </h2>
         </div>
+        <div id = "dados1">
         {% if client.function == "Luz" %}
             {% if client.action %}
                 <div class="w3-right"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
@@ -166,7 +170,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
                 <td>{{ client.name }}</td>
                 <td>{{ client.function }}</td>
                 {% if client.function == "Ar"%}
-                    <td>{{ client.value }}°C</td>
+                    <td id=value>{{ client.value }}°C</td>
                     {% if client.action%}
                         <td>Sim</td>
                     {% else %}
@@ -194,12 +198,13 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
                     </div>
          </tbody>
       </table >
+              </div>
           </div>
           <div class="w3-container w3-light-grey w3-padding-small"></div>
         <div class="w3-clear"></div>
 <div id="info" style="display:none;">
 
-    <div class="w3-container w3-padding">
+    <div id = "dados2" class="w3-container w3-padding">
       <table style="text-align:center;">
          <thead>
             <tr>
@@ -211,7 +216,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
          </thead>
          <tbody>
             <tr>
-                <td>{{ client.id }}</td>
+                <td id="client_id">{{ client.id }} </td>
                 <td>{{ client.ip }}</td>
                 <td>{{ client.ip2 }}</td>
                 {% if client.connected %}
@@ -359,22 +364,38 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
   <!-- End page content -->
 </div>
 </div>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
- <script type="text/javascript">
+    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+<script type="text/javascript">
 
 
+var client_id = {{ client.id|safe }};
+var cor = document.getElementById("cor");
+console.log("a");
+ $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    $(document).ready(function() {
+        $.get( $SCRIPT_ROOT + '/update/' +  client_id + '/1', function(data){
+                 $("#dados1").html(data);
+            }
+        );
+        $.get( $SCRIPT_ROOT + '/update/' +  client_id + '/2', function(data){
+                 $("#dados2").html(data);
+            }
+        );
+        $.get( $SCRIPT_ROOT + '/update/' +  client_id + '/3', function(data){
+                if(data.connected){
+                    cor.classList.remove("w3-blue-gray")
+                    cor.classList.add("w3-teal")
+                }else{
+                    cor.classList.remove("w3-teal")
+                    cor.classList.add("w3-blue-gray")
+                }
+            }
+        );
 
+        setTimeout(arguments.callee, 3000);
+	});
 
-
-
-		$(document).ready(function() {
-
-
-
-		    // check for new updates
-		    setInterval('getUpdates()',3000);
-
-		});
 
 
 

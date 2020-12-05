@@ -1,4 +1,4 @@
-from flask import Flask, request, flash, url_for, redirect, render_template
+from flask import Flask, request, flash, url_for, redirect, render_template, jsonify
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
 from flask_sqlalchemy import SQLAlchemy
 from flask_socketio import SocketIO, emit
@@ -118,7 +118,7 @@ class new_clients(db.Model):
     name = db.Column(db.String(100))
     function = db.Column(db.String(100))
 
-def __init__(self, name, ip, ip2, connected, function,value,action,act_value):
+def __init__(self, name, ip, ip2, connected, function, value, action, act_value):
    self.name = name
    self.ip = ip
    self.ip2 = ip2
@@ -143,10 +143,14 @@ client_put_args.add_argument("act_value", type=int, help="Likes on the client is
 
 
 client_update_args = reqparse.RequestParser()
-client_update_args.add_argument("name", type=str)
-client_update_args.add_argument("connected", type=bool)
-client_update_args.add_argument("function", type=str)
-client_update_args.add_argument("value", type=int)
+client_update_args.add_argument("name", type=str, help="Name of the client is required", required=True)
+client_update_args.add_argument("connected", type=int, help="Views of the client is required", required=True)
+client_update_args.add_argument("function", type=str, help="Views of the client is required", required=True)
+client_update_args.add_argument("value", type=int, help="Likes on the client is required", required=True)
+client_update_args.add_argument("ip", type=str, help="Likes on the client is required", required=True)
+client_update_args.add_argument("ip2", type=int, help="Likes on the client is required", required=True)
+client_update_args.add_argument("action", type=int, help="Likes on the client is required", required=True)
+client_update_args.add_argument("act_value", type=int, help="Likes on the client is required", required=True)
 
 resource_fields = {
     'id': fields.Integer,
@@ -185,15 +189,8 @@ class Client(Resource):
         result = clients.query.filter_by(id=client_id).first()
         if not result:
             abort(404, message="client doesnt exist, cannot update")
-
-        if args['name']:
-            result.name = args['name']
-        if args['connected']:
-            result.connected = args['connected']
-        if args['function']:
-            result.likes = args['function']
-        if args['value']:
-            result.likes = args['value']
+        result.value = args['value']
+        result.connected = args['connected']
 
         db.session.commit()
         return result
@@ -326,6 +323,25 @@ def new_client():
     return render_template('new_client.html', newclients=new_clients.query.order_by(new_clients.id).all() , clients = clients.query.order_by(clients.id).all(), searching = thread.get_flag())
 
 
+@app.route('/update/<int:client_id>/<int:part>', methods = ['GET'])
+def update(client_id,part):
+    client = clients.query.filter_by(id=client_id).first()
+    if part == 1:
+        return render_template('section_one.html', client=client)
+    elif part == 2:
+        return render_template('section_two.html', client=client)
+    else:
+        return jsonify(connected=client.connected)
+
+
+@app.route('/update/index', methods = ['GET'])
+def update_all():
+    return render_template('section.html', clients = clients.query.order_by(clients.id).all())
+
+
+@app.route('/update/new', methods = ['GET'])
+def update_new():
+    return render_template('section_new.html', newclients = new_clients.query.order_by(new_clients.id).all())
 
 if __name__ == "__main__":
     thread = check_thread()

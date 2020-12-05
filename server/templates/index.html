@@ -100,7 +100,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
       <h5><b><a href = "{{ url_for('index') }}"style="text-decoration: none"><i class="fa fa-power-off"></i> Minha Rede</b></h5></a>
   </header>
 
-  <div class="w3-row-padding w3-margin-bottom">
+  <div id="dados" class="w3-row-padding w3-margin-bottom">
       {% for client in clients %}
     <div class="w3-quarter">
          <a href = "{{ url_for('show_one', client_id=client.id) }}"style="text-decoration: none">
@@ -189,24 +189,18 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
  <script type="text/javascript">
 		
 
-		
-
-		var idgo;
 
 		
-		$(document).ready(function() {
+console.log("a");
+ $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+    $(document).ready(function() {
+        $.get( $SCRIPT_ROOT + '/update/index' , function(data){
+                 $("#dados").html(data);
+            }
+        );
 
-
-
-		    // check for new updates
-		    setInterval('getUpdates()',3000);
-
-		});
-			
-
-
-
-
+        setTimeout(arguments.callee, 3000);
+	});
 
 
 // Get the Sidebar
