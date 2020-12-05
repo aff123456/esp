@@ -98,11 +98,11 @@ void loop() {
 void broadcast(String mensagem) {
   //Serial.println("começa a enviar");
   //String mensagem = "pfg_ip_broadcast_cl";
-  udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255
-  udp.print(mensagem);       // conteúdo do pacote
+  udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255)
+  udp.print(mensagem);                    // conteúdo do pacote
   int test = udp.endPacket();             // pacote terminou de enviar
   //Serial.println(test);
-  delay(2500);                            // espera pra ver se tem resposta
+  delay(250);                             // espera pra ver se tem resposta
   listen(true);                           // checa pra ver se tem resposta
 }
 
@@ -118,6 +118,9 @@ void listen(bool config) {
     }
     Serial.print("Mensagem recebida: ");
     Serial.println(req);
+    if(req == "pfg_ip_response_serv") {
+      config = true;
+    }
     if(config) {
       serverIP = udp.remoteIP();
       Serial.print("Server ip: ");
