@@ -1,67 +1,67 @@
-#include <ESP8266WiFi.h>          // Replace with WiFi.h for ESP32
-#include <ESP8266WebServer.h>     // Replace with WebServer.h for ESP32
-#include <AutoConnect.h>
-#include <WiFiUdp.h>      // biblioteca udp
-#include <ArduinoJson.h>
+#include <ESP8266WiFi.h>          // biblioteca para conexão wifi
+#include <ESP8266WebServer.h>     // biblioteca necessária para autoconnect
+#include <AutoConnect.h>          // biblioteca autoconnect
+#include <WiFiUdp.h>              // biblioteca udp
+#include <ArduinoJson.h>          // biblioteca JSON para sistemas embarcados
  
 WiFiUDP udp;              // cria um objeto da classe UDP
 
-IPAddress serverIP(255,255,255,255);
-IPAddress broadcastIP(255,255,255,255);
+IPAddress serverIP(255,255,255,255);    // ip placeholder para o servidor
+IPAddress broadcastIP(255,255,255,255); // ip especial de broadcast
 
-int port = 5001;
+int port = 5001;        // porta udp
 
-bool flag_err = false;
-int err_cod = 0;
+bool flag_err = false;  // flag de erro
+int err_cod = 0;        // código de erro
 
-String confirmation = "OK";
-String errmsg = "error";
-String notFound = "404";
+String confirmation = "OK"; // string de confirmação de pacote recebido
+String errmsg = "error";    // string de erro no pacote recebido
+String notFound = "404";    // string de comando não encontrado
 
-const int luz_1 = 1;
-const int luz_2 = 2;
-const int luz_3 = 3;
+const int luz_1 = 14;        // porta da luz 1
+const int luz_2 = 12;        // porta da luz 2
+const int luz_3 = 13;        // porta da luz 3
 
 
 ESP8266WebServer Server;          // Replace with WebServer for ESP32
-AutoConnect      Portal(Server);
+AutoConnect      Portal(Server);  // autoconnect magic
 
 void rootPage() {
   char content[] = "Hello, world";
   Server.send(200, "text/plain", content);
 }
 
-
 void setup() {
-  delay(1000);
-  Serial.begin(115200);
-  Serial.println();
+  delay(1000);            // delay de 1 segundo
+  Serial.begin(115200);   // inicializa comunicação serial
+  Serial.println();       // print de uma linha em branco
 
-  udp.begin(port);
+  udp.begin(port);        // iniciliza comunicação udp na porta
 
-  StaticJsonDocument<200> doc;
+  StaticJsonDocument<200> doc;  // cria um documento JSON para enviar ao servidor na conexão com dados do cliente
   doc["id"] = 45;
   doc["name"] = "Esp_Luz_45";
   doc["ip"] = 0;
   doc["ip2"] = 1;
   doc["function"] = "Luz";
   String response;
-  serializeJson(doc, response);
-  Serial.println(response);
+  serializeJson(doc, response); // armazena o pacote JSON em uma variável do tipo String
+  Serial.println(response);     // print no monitor serial da variável
   
   Server.on("/", rootPage);
   // codigo fica travado nesse if até o cliente conectar na rede do esp e configurar a rede do cliente no portal
   if (Portal.begin()) {
     Serial.println("WiFi connected: " + WiFi.localIP().toString());
   }
-  // serverIP == broadcastIP quer dizer que o cliente não sabe o IP do servidor
+  // serverIP == broadcastIP quer dizer que o cliente ainda não sabe o IP do servidor
   while(serverIP == broadcastIP) {
     broadcast(response);    // manda um pacote e vê se tem resposta
     delay(2500);            // espera pra uma nova tentativa
   }
-  Serial.println("Servidor conectado, ip: " + serverIP.toString());
+  Serial.println("Servidor conectado, ip: " + serverIP.toString()); // print do ip do servidor no monitor serial
 }
 
+// setup sem autoconnect
 /*
 void setup() {
   delay(1000);
@@ -113,8 +113,8 @@ void listen(bool config) {
   if (udp.parsePacket() > 0) {            // parsePacket() =  tamanho do pacote a ser lido, 0 = não há pacotes a serem lidos (https://www.arduino.cc/en/Reference/WiFiUDPParsePacket)
     req = "";                             // zera a string em preparação pra mensagem
     while (udp.available() > 0) {         // available() =  número de bytes/caracteres já recebidos a serem lidos (https://www.arduino.cc/en/Reference/WiFiUDPAvailable)
-      char z = udp.read();                // 
-      req += z;
+      char z = udp.read();                // lê o próximo caractere e salva na variável
+      req += z;                           // adiciona o caractere à string recebida
     }
     Serial.print("Mensagem recebida: ");
     Serial.println(req);
@@ -148,31 +148,37 @@ void filtrar(int comando) {
     case 101:
       // ligar a luz 01
       atuar(luz_1,true);
+      Serial.println("Luz 1 ligada");
       send(confirmation);
     break;
     case 102:
       // ligar a luz 02
       atuar(luz_2,true);
+      Serial.println("Luz 2 ligada");
       send(confirmation);
     break;
     case 103:
       // ligar a luz 03
       atuar(luz_3,true);
+      Serial.println("Luz 3 ligada");
       send(confirmation);
     break;
     case 111:
       // desligar a luz 01
       atuar(luz_1,false);
+      Serial.println("Luz 1 desligada");
       send(confirmation);
     break;
     case 112:
       // desligar a luz 02
       atuar(luz_2,false);
+      Serial.println("Luz 2 desligada");
       send(confirmation);
     break;
     case 113:
       // desligar a luz 03
       atuar(luz_3,false);
+      Serial.println("Luz 3 desligada");
       send(confirmation);
     break;
     default:
@@ -184,13 +190,12 @@ void filtrar(int comando) {
 }
 
 void atuar(int porta, int sinal) {
-  /*
   if(sinal) {
     digitalWrite(porta, HIGH);
   } else {
     digitalWrite(porta, LOW);
   }
-  */
+  /*
   if(sinal) {
     Serial.print("luz ");
     Serial.print(porta);
@@ -200,6 +205,7 @@ void atuar(int porta, int sinal) {
     Serial.print(porta);
     Serial.println(" desligada");
   }
+  */
 }
 
 void send(String mensagem) {
