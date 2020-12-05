@@ -15,6 +15,7 @@ IPAddress serverIP(255,255,255,255);    // ip placeholder para o servidor
 IPAddress broadcastIP(255,255,255,255); // ip especial de broadcast
 
 int port = 5001;        // porta udp
+int port_broad = 5050;  // porta udp broadcast
 
 bool flag_err = false;  // flag de erro
 int err_cod = 0;        // código de erro
@@ -61,6 +62,7 @@ void setup() {
   Serial.println();       // print de uma linha em branco
 
   udp.begin(port);        // iniciliza comunicação udp na porta
+  udp.begin(port_broad);
 
   pinMode(IRled,OUTPUT);
   pinMode(sensor,INPUT);
@@ -70,11 +72,11 @@ void setup() {
   printState();
   
   StaticJsonDocument<200> doc;  // cria um documento JSON para enviar ao servidor na conexão com dados do cliente
-  doc["id"] = 45;
-  doc["name"] = "Esp_Luz_45";
+  doc["id"] = 76;
+  doc["name"] = "Esp_Ar_76";
   doc["ip"] = 0;
   doc["ip2"] = 1;
-  doc["function"] = "Luz";
+  doc["function"] = "Ar";
   String response;
   serializeJson(doc, response); // armazena o pacote JSON em uma variável do tipo String
   Serial.println(response);     // print no monitor serial da variável
@@ -129,12 +131,12 @@ void loop() {
 void broadcast(String mensagem) {
   //Serial.println("começa a enviar");
   //String mensagem = "pfg_ip_broadcast_cl";
-  udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255)
-  udp.print(mensagem);                    // conteúdo do pacote
-  int test = udp.endPacket();             // pacote terminou de enviar
+  udp.beginPacket(broadcastIP, port_broad);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255)
+  udp.print(mensagem);                          // conteúdo do pacote
+  int test = udp.endPacket();                   // pacote terminou de enviar
   //Serial.println(test);
-  delay(250);                             // espera pra ver se tem resposta
-  listen(true);                           // checa pra ver se tem resposta
+  delay(250);                                   // espera pra ver se tem resposta
+  listen(true);                                 // checa pra ver se tem resposta
 }
 
 // checa a porta udp pra ver se tem pacotes disponíveis
@@ -182,7 +184,7 @@ void filtrar(int comando) {
   if(temp >= temp_min && temp <= temp_max) {
     temperatura = temp;
   } else {
-    comando = 404;
+    comando = 99;
   }
   switch(comando) {
     case 0:
@@ -197,32 +199,32 @@ void filtrar(int comando) {
     case 30:
       // ligar o ar
       atuar(true);
-      Serial.print("Ar ligado, temperatura: ");
-      Serial.println(temperatura);
       send(confirmation);
     break;
     case 31:
       // desligar o ar
       atuar(false);
-      Serial.println("Ar desligado");
       send(confirmation);
     break;
     case 32:
       // ler entrada do sensor de temperatura
       // atuar(luz_1,false);
       temp = random(15,40);
-      Serial.println("Temperatura do ambiente: ");
-      send(confirmation);
+      Serial.print("Temperatura do ambiente: ");
+      Serial.println(temp);
+      char buff[16];
+      itoa(temp,buff,10);
+      send(buff);
     break;
     case 33:
       // modificar a varivel temperatura
-      atuar(true);
+      // atuar(true);
       Serial.print("Nova temperatura: ");
       Serial.print(temperatura);
       Serial.println(". Caso o ar esteja ligado essa temperatura será enviada");
       send(confirmation);
     break;
-    case 404:
+    case 99:
       // temperatura inválida
       Serial.println("Temperatura inválida, verificar");
       send(tempErr);
@@ -270,6 +272,11 @@ void atuar(bool sinal) {
 void send(String mensagem) {
   Serial.print("Retorno enviado: ");
   Serial.println(mensagem);
+
+  udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255)
+  udp.print(mensagem);                    // conteúdo do pacote
+  int test = udp.endPacket();             // pacote terminou de enviar
+  
   udp.beginPacket(serverIP, port);
   udp.print(mensagem);
   if(udp.endPacket() != 1) {
