@@ -41,7 +41,7 @@ class check_thread(threading.Thread):
 
         sock = socket.socket(socket.AF_INET,  # Internet
                              socket.SOCK_DGRAM)  # UDP
-        sock.bind(('', UDP_PORT))
+        sock.bind(('', 5050))
         response = 'pfg_ip_response_serv'
         sock.settimeout(10)
 
@@ -206,10 +206,46 @@ def enviar_codigo(id,codigo):
 
     sock = socket.socket(socket.AF_INET,  # Internet
                          socket.SOCK_DGRAM)  # UDP
-
+    sock.bind(('', UDP_PORT))
+    sock.settimeout(10)
     sent = sock.sendto(codigo.encode(), (esp.ip, int(esp.ip2)))
-    # Ouvir a confirmação do código
-    # Salvar dados modificados na DB
+
+    try:
+        data, address = sock.recvfrom(4096)
+        print(data)
+        data = str(data.decode('UTF-8'))
+        if data == "OK":
+            return 1
+        elif data == "404":
+            return 2
+    except:
+        print("Num achei nada")
+        return 4
+
+
+
+
+def enviar_codigo_temp(id,codigo,temp):
+    esp = clients.query.filter_by(id=id).first()
+
+    sock = socket.socket(socket.AF_INET,  # Internet
+                         socket.SOCK_DGRAM)  # UDP
+    sock.bind(('', UDP_PORT))
+    sock.settimeout(10)
+    sent = sock.sendto((codigo+temp).encode(), (esp.ip, int(esp.ip2)))
+    try:
+        data, address = sock.recvfrom(4096)
+        print(data)
+        data = str(data.decode('UTF-8'))
+        if data == "OK":
+            return 1
+        elif data == "404":
+            return 2
+        elif data == "tempErr":
+            return 3
+    except:
+        print("Num achei nada")
+        return 4
 
 
 class Clients(Resource):
@@ -266,10 +302,20 @@ def show_one(client_id):
         elif request.form['button'] == "funcao":
             if request.form['codigo'] == "30" or request.form['codigo'] == "33":
                 print(request.form['codigo']+request.form['temp'])
-                #enviar_codigo(client_id,request.form['codigo']+request.form['temp'])
+                msg = enviar_codigo_temp(client_id,request.form['codigo'],request.form['temp'])
+
+                # Salvar dados modificados na DB
             else:
                 print(request.form['codigo'])
-                #enviar_codigo(client_id, request.form['codigo'])
+                msg  = enviar_codigo(client_id, request.form['codigo'])
+            if msg == 2:
+                flash('404', 'error')
+            elif msg == 3:
+                flash('temperr', 'error')
+            elif msg == 4:
+                flash('Tente de novo.', 'error')
+            # Salvar dados modificados na DB
+
         else:
             if not request.form['codigo']:
                 flash('Digite um código.', 'error')
