@@ -10,6 +10,7 @@ IPAddress serverIP(255,255,255,255);    // ip placeholder para o servidor
 IPAddress broadcastIP(255,255,255,255); // ip especial de broadcast
 
 int port = 5001;        // porta udp
+int port_broad = 5050;        // porta udp
 
 bool flag_err = false;  // flag de erro
 int err_cod = 0;        // código de erro
@@ -108,7 +109,7 @@ void loop() {
 void broadcast(String mensagem) {
   //Serial.println("começa a enviar");
   //String mensagem = "pfg_ip_broadcast_cl";
-  udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255)
+  udp.beginPacket(broadcastIP, port_broad);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255)
   udp.print(mensagem);                    // conteúdo do pacote
   int test = udp.endPacket();             // pacote terminou de enviar
   //Serial.println(test);
@@ -176,8 +177,10 @@ void filtrar(int comando) {
 void atuar(int porta) {
   if(digitalRead(porta) == HIGH){
     retorno = "1";
+    Serial.println("A porta está fechada");
   } else {
     retorno = "0";
+    Serial.println("A porta está aberta");
   }  
 }
 
