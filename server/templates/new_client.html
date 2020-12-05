@@ -118,36 +118,43 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
          <div class="w3-container w3-padding">
 
          {% if newclients %}
-              <table>
+              <table style="text-align:center;">
          <thead>
             <tr>
                <th>Nome</th>
+               <th>ID</th>
                <th>Função</th>
-               <th>Id</th>
-               <th>Ip</th>
+               <th>IP</th>
                <th> </th>
             </tr>
          </thead>
 
          <tbody>
             {% for newclient in newclients %}
-               <tr>
-                  <td>{{ newclient.name }}</td>
-                  <td>{{ newclient.function }}</td>
-                  <td>{{ newclient.id }}</td>
-                  <td>{{ newclient.ip }}</td>
-                  <td><form action="" method="post">
-                     <input type = "hidden" name = "id" value = {{ newclient.id }} />
-                     <input type = "hidden" name = "ip" value = {{ newclient.ip }} />
-                     <input type = "hidden" name = "ip2" value = {{ newclient.ip2 }} />
-                     <input type = "hidden" name = "name" value = {{ newclient.name }} />
-                     <input type = "hidden" name = "connected" value = {{ newclient.connected }} />
-                     <input type = "hidden" name = "function" value = {{ newclient.function }} />
-                     <input type = "hidden" name = "value" value = {{ newclient.value }} />
-                     <input type = "hidden" name="button" value="Add Client" />
-                     <button type = "submit" class="w3-button w3-light-grey w3-round-large" style="padding: 8px"><i class="fa fa-plus fa-fw" style="margin-right: 8px"></i>Add</button>
+                <tr>
+                    <td>{{ newclient.name }}</td>
+                    <td>{{ newclient.id }}</td>
+                    <td>{{ newclient.function }}</td>
+                    <td>{{ newclient.ip }}</td>
+                    <td><form action="" method="post">
+                        <input type = "hidden" name = "id" value = {{ newclient.id }} />
+                        <input type = "hidden" name = "ip" value = {{ newclient.ip }} />
+                        <input type = "hidden" name = "ip2" value = {{ newclient.ip2 }} />
+                        <input type = "hidden" name = "name" value = {{ newclient.name }} />
+                        <input type = "hidden" name = "connected" value = 0 />
+                        <input type = "hidden" name = "function" value = {{ newclient.function }} />
+                        {% if newclient.function == "Ar" %}
+                            <input type = "hidden" name = "value" value = 21 />
+                            <input type = "hidden" name = "act_value" value = 21 />
+                        {% else %}
+                            <input type = "hidden" name = "value" value = 0 />
+                            <input type = "hidden" name = "act_value" value = 0 />
+                        {% endif %}
+                        <input type = "hidden" name = "action" value = 0 />
+                        <input type = "hidden" name="button" value="Add Client" />
+                        <button type = "submit" class="w3-button w3-light-grey w3-round-large" style="padding: 8px"><i class="fa fa-plus fa-fw" style="margin-right: 8px"></i>Add</button>
                     </form></td>
-               </tr>
+                </tr>
             {% endfor %}
          </tbody>
       </table>

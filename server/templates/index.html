@@ -110,32 +110,44 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <div class="w3-container w3-blue-gray w3-padding-16 w3-round-xlarge">
       {% endif %}
         {% if client.function == "Luz" %}
-          <div class="w3-left"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
-        {% elif client.function == "Portao" %}
-          <div class="w3-left"><i class="fas fa-door-open w3-xxxlarge"></i></div>
+            {% if client.action %}
+                <div class="w3-left"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
+            {% else %}
+                <div class="w3-left w3-text-dark-gray"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
+            {% endif %}
+        {% elif client.function == "Porta" %}
+          {% if client.value%}
+            <div class="w3-left"><i class="fas fa-door-closed w3-xxxlarge"></i></div>
+          {% else %}
+            <div class="w3-left"><i class="fas fa-door-open w3-xxxlarge"></i></div>
+          {% endif %}
         {% elif client.function == "Ar" %}
-          <div class="w3-left"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+            {% if client.action %}
+                <div class="w3-left"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+            {% else %}
+                <div class="w3-left w3-text-dark-gray"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+            {% endif %}
         {% else %}
           <div class="w3-left"><i class="fa fa-power-off w3-xxxlarge" ></i></div>
         {% endif %}
         <div class="w3-right">
-		    <h3>{{ client.name }} </h3>
+		    <h4>{{ client.name }} </h4>
         </div>
         <div class="w3-clear"></div>
           <div class="w3-left">
             {% if client.function == "Ar"%}
                 <h3>{{ client.value }}°C </h3>
             {% elif client.function == "Luz"%}
-                {% if client.value %}
-                    <h3>On</h3>
+                {% if client.action %}
+                    <h3>Ligada</h3>
                 {% else %}
-                    <h3>Off</h3>
+                    <h3>Desligada</h3>
                 {% endif %}
-            {% elif client.function == "Portao"%}
+            {% elif client.function == "Porta"%}
                 {% if client.value %}
-                    <h3>Fechado</h3>
+                    <h3>Fechada</h3>
                 {% else %}
-                    <h3>Aberto</h3>
+                    <h3>Aberta</h3>
                 {% endif %}
             {% else %}
                 <h3>See More </h3>

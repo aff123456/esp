@@ -45,6 +45,9 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
                 bottom:0;
                 left:0;
             }
+
+
+
 </style>
 <body class="w3-light-grey">
 
@@ -112,11 +115,23 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
           </h2>
         </div>
         {% if client.function == "Luz" %}
-          <div class="w3-right"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
-        {% elif client.function == "Portao" %}
-          <div class="w3-right"><i class="fas fa-door-open w3-xxxlarge"></i></div>
+            {% if client.action %}
+                <div class="w3-right"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
+            {% else %}
+                <div class="w3-right w3-text-dark-gray"><i class="far fa-lightbulb w3-xxxlarge"></i></div>
+            {% endif %}
+        {% elif client.function == "Porta" %}
+          {% if client.value%}
+            <div class="w3-right"><i class="fas fa-door-closed w3-xxxlarge"></i></div>
+          {% else %}
+            <div class="w3-right"><i class="fas fa-door-open w3-xxxlarge"></i></div>
+          {% endif %}
         {% elif client.function == "Ar" %}
-          <div class="w3-right"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+          {% if client.action %}
+                <div class="w3-right"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+            {% else %}
+                <div class="w3-right w3-text-dark-gray"><i class="fa fa-thermometer-three-quarters w3-xxxlarge"></i></div>
+            {% endif %}
         {% else %}
           <div class="w3-right"><i class="fa fa-power-off w3-xxxlarge"></i></div>
         {% endif %}
@@ -130,33 +145,62 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
         <div class="w3-clear"></div>
           <div class="w3-container w3-light-grey w3-padding-small"></div>
               <div class="w3-container w3-padding">
-      <table>
+      <table style="text-align:center;">
          <thead>
             <tr>
-               <th>Nome</th>
-               <th>Função</th>
-               <th>Valor</th>
+                <th>Nome</th>
+                <th>Função</th>
+                {% if client.function == "Ar"%}
+                    <th>Temp</th>
+                    <th>Ligado</th>
+                {% elif client.function == "Porta" %}
+                    <th>Fechada</th>
+                {% elif client.function == "Luz" %}
+                    <th>Ligado</th>
+                {% endif %}
+
             </tr>
          </thead>
          <tbody>
-               <tr>
-                  <td>{{ client.name }}</td>
-                  <td>{{ client.function }}</td>
-                  <td>{{ client.value }}</td>
-               </tr>
+            <tr>
+                <td>{{ client.name }}</td>
+                <td>{{ client.function }}</td>
+                {% if client.function == "Ar"%}
+                    <td>{{ client.value }}°C</td>
+                    {% if client.action%}
+                        <td>Sim</td>
+                    {% else %}
+                        <td>Não</td>
+                    {% endif %}
+                {% elif client.function == "Porta" %}
+                    {% if client.value%}
+                        <td>Sim</td>
+                    {% else %}
+                        <td>Não</td>
+                    {% endif %}
+                {% elif client.function == "Luz" %}
+                    {% if client.action%}
+                        <td>Sim</td>
+                    {% else %}
+                        <td>Não</td>
+                    {% endif %}
+                {% endif %}
+
+
+            </tr>
          <div class="w3-right">
              <br>
                 <a class="w3-circle" onclick="abreinfo();" style="padding: 8px"><i class="fa fa-plus fa-fw"></i></a>
                     </div>
          </tbody>
-      </table>
+      </table >
           </div>
           <div class="w3-container w3-light-grey w3-padding-small"></div>
         <div class="w3-clear"></div>
 <div id="info" style="display:none;">
 
     <div class="w3-container w3-padding">
-      <table>
+      <table style="text-align:center;">
          <thead>
             <tr>
                <th>ID</th>
@@ -166,12 +210,17 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
             </tr>
          </thead>
          <tbody>
-               <tr>
-                  <td>{{ client.id }}</td>
-                  <td>{{ client.ip }}</td>
-                  <td>{{ client.ip2 }}</td>
-                  <td>{{ client.connected }}</td>
-               </tr>
+            <tr>
+                <td>{{ client.id }}</td>
+                <td>{{ client.ip }}</td>
+                <td>{{ client.ip2 }}</td>
+                {% if client.connected %}
+                    <td>Conectado</td>
+                {% else %}
+                    <td>Desconectado</td>
+                {% endif %}
+
+            </tr>
 
          </tbody>
       </table>
@@ -183,18 +232,51 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
 
           <div class="w3-clear"></div>
             <div id="botoes" align="center" style="display:none;">
-                <div class="w3-bar">
                     {% if client.function == "Luz" %}
-                    <a class="w3-button w3-light-grey w3-round-large" onclick="ligaluz();" style="padding: 8px"><i class="far fa-lightbulb fa-fw"style="margin-right: 8px"></i>Ligar</a>
-                    <a class="w3-button w3-light-grey w3-round-large" onclick="apagaluz();" style="padding: 8px"><i class="fas fa-lightbulb fa-fw"style="margin-right: 8px"></i>Desligar</a>
-                    {% elif client.function == "Portao" %}
-                    <a class="w3-button w3-light-grey w3-round-large" onclick="ligaluz();" style="padding: 8px"><i class="fas fa-door-open fa-fw"style="margin-right: 8px"></i>Abrir</a>
-                    <a class="w3-button w3-light-grey w3-round-large" onclick="apagaluz();" style="padding: 8px"><i class="fas fa-door-closed fa-fw "style="margin-right: 8px"></i>Fechar</a>
+                        <form action = "" method = "post" style="display: inline;">
+                            <input type = "hidden" name = "codigo" value = 10 />
+                            <input type = "hidden" name = "button" value = "funcao" />
+                            <button type = "submit" class="w3-button w3-light-grey w3-round-large" style=" padding: 8px; margin-right: 8px"><i class="far fa-lightbulb fa-fw" style="margin-right: 8px"></i><a>Ligar</a></button>
+                        </form>
+                        <form action = "" method = "post" style="display: inline;">
+                            <input type = "hidden" name = "codigo" value = 11 />
+                            <input type = "hidden" name = "button" value = "funcao" />
+                            <button type = "submit" class="w3-button w3-light-grey w3-round-large" style="padding: 8px"><i class="fas fa-lightbulb fa-fw" style="margin-right: 8px"></i><a>Desligar</a></button>
+                        </form>
+                    {% elif client.function == "Porta" %}
+                        <form action = "" method = "post" style="display: inline;">
+                            <input type = "hidden" name = "codigo" value = 22 />
+                            <input type = "hidden" name = "button" value = "funcao" />
+                            <button type = "submit" class="w3-button w3-light-grey w3-round-large" style=" padding: 8px;"><i class="fa fa-spinner fa-fw" style="margin-right: 8px"></i><a>Atualizar</a></button>
+                        </form>
                     {% elif client.function == "Ar" %}
+                        <form action = "" method = "post" style="display: inline;">
+                            <input type = "hidden" name = "codigo" value = 33 />
+                            <input type = "hidden" name = "button" value = "funcao" />
+                            <input type= "number" class="w3-input" style="display: inline;width:48px" name = "temp" value = {{client.act_value}} id="myRange" min="16" max="30">
+                            <button type = "submit" class="w3-button w3-light-grey w3-round-large" style=" padding: 8px; margin-left: 8px"><i class="fa fa-thermometer-three-quarters fa-fw" style="margin-right: 8px"></i><a>Setar Temp</a></button>
+                        </form>
+
+                        <div class="w3-padding "></div>
+                        <form action = "" method = "post" style="display: inline;">
+                            <input type = "hidden" name = "codigo" value = 30 />
+                            <input type = "hidden" name = "button" value = "funcao" />
+                            <input type = "hidden" name = "temp" id="demo" />
+                            <button type = "submit" class="w3-button w3-light-grey w3-round-large" style=" padding: 8px; margin-right: 8px"><i class="fa fa-power-off fa-fw" style="margin-right: 8px"></i><a>Ligar</a></button>
+                        </form>
+                        <form action = "" method = "post" style="display: inline;">
+                            <input type = "hidden" name = "codigo" value =31 />
+                            <input type = "hidden" name = "button" value = "funcao" />
+                            <button type = "submit" class="w3-button w3-light-grey w3-round-large" style="padding: 8px; margin-right: 8px"><i class="fa fa-power-off fa-fw" style="margin-right: 8px"></i><a>Desligar</a></button>
+                        </form>
+                        <form action = "" method = "post" style="display: inline;">
+                            <input type = "hidden" name = "codigo" value = 32 />
+                            <input type = "hidden" name = "button" value = "funcao" />
+                            <button type = "submit" class="w3-button w3-light-grey w3-round-large" style=" padding: 8px"><i class="fa fa-spinner fa-fw" style="margin-right: 8px"></i><a>Atualizar</a></button>
+                        </form>
                     {% else %}
                     {% endif %}
-                    <div class="w3-padding"></div>
-                </div>
+                <div class="w3-padding "></div>
             </div>
           <div id="editar" align="left" style="display:none;">
             <form action = "" method = "post" >
@@ -241,7 +323,7 @@ html,body,h1,h2,h3,h4,h5 {font-family: "Raleway", sans-serif}
             {%- for message in get_flashed_messages() %}
                 <a style="margin-left: 8px">{{ message }}</a>
             {%- endfor %}
-              <a class="w3-button w3-light-grey w3-round-large " onclick="abreenvia(); " style="padding: 8px"><i class="fa fa-send fa-fw"style=" margin-right: 8px"></i>Enviar Código</a>
+            <!--<a class="w3-button w3-light-grey w3-round-large " onclick="abreenvia(); " style="padding: 8px"><i class="fa fa-send fa-fw"style=" margin-right: 8px"></i>Enviar Código</a>!-->
           </div>
           <div class="w3-right">
             <form action = "" method = "post">
@@ -367,6 +449,14 @@ function abrebotoes() {
   }
 }
 
+
+var slider = document.getElementById("myRange");
+var output = document.getElementById("demo");
+output.value = slider.value;
+
+slider.oninput = function() {
+  output.value = this.value;
+}
 
 </script>
 

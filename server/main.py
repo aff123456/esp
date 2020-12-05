@@ -7,8 +7,8 @@ import socket
 import time
 import json
 
-HTTP_PORT = 5000
-UDP_PORT = 5001
+HTTP_PORT = 5001
+UDP_PORT = 5005
 
 my_ip = socket.gethostbyname(socket.getfqdn())
 
@@ -43,34 +43,40 @@ class check_thread(threading.Thread):
                              socket.SOCK_DGRAM)  # UDP
         sock.bind(('', UDP_PORT))
         response = 'pfg_ip_response_serv'
+        sock.settimeout(10)
 
         while self.__running.isSet():
             self.__flag.wait() # return immediately when it is True, block until the internal flag is True when it is False
+            print("Bora")
 
-            data, address = sock.recvfrom(4096)
-            print(data)
-            data = str(data.decode('UTF-8'))
-            print(data)
-            data_json = json.loads(data)
-            print(data_json["id"])
+            try:
+                data, address = sock.recvfrom(4096)
+                print(data)
+                data = str(data.decode('UTF-8'))
+                print(data)
+                data_json = json.loads(data)
+                print(data_json["id"])
 
-            if data_json["id"]:
-                print('Client ip: ' + str(address[0]))
-                print(address)
-                print('responding...')
-                sent = sock.sendto(response.encode(), address)
-                print('Sent confirmation back')
-                result = new_clients.query.filter_by(id=data_json['id']).first()
-                if not result:
-                    client = new_clients(id=data_json["id"],ip = str(address[0]), ip2 = address[1], name=data_json["name"],\
-                            connected=bool(data_json["connected"]), function=data_json["function"], value=int(data_json["value"]))
-                    try:
-                        db.session.add(client)
-                        db.session.commit()
-                    except:
-                        print("An exception occurred")
-                else:
-                    print('Client already on the list')
+                if data_json["id"]:
+                    print('Client ip: ' + str(address[0]))
+                    print(address)
+                    print('responding...')
+                    sent = sock.sendto(response.encode(), address)
+                    print('Sent confirmation back')
+                    result = new_clients.query.filter_by(id=data_json['id']).first()
+                    if not result:
+                        client = new_clients(id=data_json["id"],ip = str(address[0]), ip2 = address[1], name=data_json["name"],\
+                             function=data_json["function"])
+                        try:
+                            db.session.add(client)
+                            db.session.commit()
+                        except:
+                            print("An exception occurred")
+                    else:
+                        print('Client already on the list')
+            except:
+                print("Num achei nada")
+
             if not self.__flag.isSet():
                 print('UDP Socket stopped searching')
 
@@ -101,23 +107,26 @@ class clients(db.Model):
     connected = db.Column(db.Boolean)
     function = db.Column(db.String(100))
     value = db.Column(db.Integer)
+    action = db.Column(db.Boolean)
+    act_value = db.Column(db.Integer)
+
 
 class new_clients(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     ip = db.Column(db.String(20), primary_key=True)
     ip2 = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100))
-    connected = db.Column(db.Boolean)
     function = db.Column(db.String(100))
-    value = db.Column(db.Integer)
 
-def __init__(self, name, ip, ip2, connected, function,value):
+def __init__(self, name, ip, ip2, connected, function,value,action,act_value):
    self.name = name
    self.ip = ip
    self.ip2 = ip2
    self.connected = connected
    self.function = function
    self.value = value
+   self.action = action
+   self.act_value = act_value
 
 db.create_all()
 
@@ -129,6 +138,8 @@ client_put_args.add_argument("function", type=str, help="Views of the client is 
 client_put_args.add_argument("value", type=int, help="Likes on the client is required", required=True)
 client_put_args.add_argument("ip", type=str, help="Likes on the client is required", required=True)
 client_put_args.add_argument("ip2", type=int, help="Likes on the client is required", required=True)
+client_put_args.add_argument("action", type=int, help="Likes on the client is required", required=True)
+client_put_args.add_argument("act_value", type=int, help="Likes on the client is required", required=True)
 
 
 client_update_args = reqparse.RequestParser()
@@ -162,7 +173,8 @@ class Client(Resource):
         result = clients.query.filter_by(id=client_id).first()
         if result:
             abort(409, message="Client id taken...")
-        client = clients(id=client_id, name=args['name'], ip=args['ip'], ip2=args['ip2'], connected=args['connected'], function=args['function'], value=args['value'])
+        client = clients(id=client_id, name=args['name'], ip=args['ip'], ip2=args['ip2'], connected=args['connected'],\
+                         function=args['function'], value=args['value'], action=args['action'], act_value=args['act_value'])
         db.session.add(client)
         db.session.commit()
         return client, 201
@@ -192,6 +204,15 @@ class Client(Resource):
 #        return '',204
 
 
+def enviar_codigo(id,codigo):
+    esp = clients.query.filter_by(id=id).first()
+
+    sock = socket.socket(socket.AF_INET,  # Internet
+                         socket.SOCK_DGRAM)  # UDP
+
+    sent = sock.sendto(codigo.encode(), (esp.ip, int(esp.ip2)))
+    # Ouvir a confirmação do código
+    # Salvar dados modificados na DB
 
 
 class Clients(Resource):
@@ -245,6 +266,13 @@ def show_one(client_id):
             db.session.delete(clients.query.filter_by(id=client_id).first())
             db.session.commit()
             return redirect(url_for('index'))
+        elif request.form['button'] == "funcao":
+            if request.form['codigo'] == "30" or request.form['codigo'] == "33":
+                print(request.form['codigo']+request.form['temp'])
+                #enviar_codigo(client_id,request.form['codigo']+request.form['temp'])
+            else:
+                print(request.form['codigo'])
+                #enviar_codigo(client_id, request.form['codigo'])
         else:
             if not request.form['codigo']:
                 flash('Digite um código.', 'error')
@@ -277,8 +305,8 @@ def new_client():
         else:
             result = clients.query.filter_by(id=request.form['id']).first()
             if not result:
-                client = clients(id=request.form['id'], ip=request.form['ip'], ip2=request.form['ip2'], name=request.form['name'], connected=bool(request.form['connected']),
-                             function=request.form['function'], value=request.form['value'])
+                client = clients(id=request.form['id'], ip=request.form['ip'], ip2=request.form['ip2'], name=request.form['name'], connected=int(request.form['connected']),
+                             function=request.form['function'], value=request.form['value'], action=int(request.form['action']), act_value=request.form['act_value'])
                 db.session.add(client)
                 db.session.commit()
 
