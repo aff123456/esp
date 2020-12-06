@@ -7,9 +7,9 @@ import socket
 import time
 import json
 
-HTTP_PORT = 5001
-UDP_PORT = 5005
-UDP_PORT_BROAD = 5051
+HTTP_PORT = 5000
+UDP_PORT = 5001
+UDP_PORT_BROAD = 5050
 
 my_ip = socket.gethostbyname(socket.getfqdn())
 
