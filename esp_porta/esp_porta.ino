@@ -9,8 +9,8 @@ WiFiUDP udp;              // cria um objeto da classe UDP
 IPAddress serverIP(255,255,255,255);    // ip placeholder para o servidor
 IPAddress broadcastIP(255,255,255,255); // ip especial de broadcast
 
-int port = 5001;        // porta udp
-int port_broad = 5050;        // porta udp
+int port = 5001;          // porta udp
+int port_broad = 5050;    // porta udp broadcast
 
 bool flag_err = false;  // flag de erro
 int err_cod = 0;        // código de erro
