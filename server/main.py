@@ -313,17 +313,15 @@ def update_db_ok(id,codigo):
         if codigo == "10":
             print("10")
             client.action = 1
-            db.session.commit()
         elif codigo == "11":
             print("11")
             client.action = 0
-            db.session.commit()
     else:
         print("AT")
         if codigo == "31":
             print("31")
             client.action = 0
-            db.session.commit()
+    db.session.commit()
 
     print("Salvo na DataBase")
 
@@ -332,25 +330,22 @@ def update_db_value(id, codigo, value):
     client.connected = 1
     if client.function == "Porta":
         print("Porta")
-        if codigo == "22":
+        if codigo == 22:
             print("22")
             client.value = int(value)
-            db.session.commit()
     else:
         print("Ar")
-        if codigo == "32":
+        if codigo == 32:
             print("32")
             client.value = int(value)
-            db.session.commit()
-        elif codigo == "33":
+        elif codigo == 33:
             print("33")
             client.act_value = int(value)
-            db.session.commit()
-        elif codigo == "30":
+        elif codigo == 30:
             print("30")
             client.action = 1
             client.act_value = int(value)
-            db.session.commit()
+    db.session.commit()
     print("Salvo na DataBase")
 
 def update_db_off(id):
