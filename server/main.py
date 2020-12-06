@@ -1,6 +1,7 @@
 from flask import Flask, request, flash, url_for, redirect, render_template, jsonify
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
-from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy, BaseQuery
+from sqlalchemy.orm import load_only
 from flask_socketio import SocketIO, emit
 import threading
 import socket
@@ -23,6 +24,46 @@ db = SQLAlchemy(app)
 
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
+
+
+
+class onoff_thread (threading.Thread):
+    def __init__(self):
+        threading.Thread.__init__(self)
+
+    def run(self):
+        while True:
+            try:
+                ids = clients.query.order_by(clients.id).all()
+                if ids:
+                    print("Checando conexão")
+                else:
+                    print("Não há clientes para checar")
+                for x in ids:
+
+                    print("Checando ID:"+str(x.id))
+                    cli = clients.query.filter_by(id=x.id).first()
+                    if cli.function == "Ar":
+                        cod = 32
+                    elif cli.function == "Porta":
+                        cod = 22
+                    else:
+                        cod = 1
+
+                    print(cli.function+", código: "+str(cod))
+                    msg = enviar_codigo(x.id, str(cod))
+                    if msg == 4:
+                        update_db_off(x.id)
+                        print("Desconectado")
+                    elif msg == 1:
+                        update_db_ok(x.id, str(cod))
+                        print("Conectado")
+                    else:
+                        update_db_value(x.id, str(cod), msg)
+                        print("Conectado, valor:" +msg)
+            except:
+                print("Falha na checagem")
+            time.sleep(10)   # Tempo entre cada check
 
 
 class check_thread(threading.Thread):
@@ -102,8 +143,8 @@ class check_thread(threading.Thread):
 
 class clients(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    ip = db.Column(db.String(20), primary_key=True)
-    ip2 = db.Column(db.Integer, primary_key=True)
+    ip = db.Column(db.String(20),)
+    ip2 = db.Column(db.Integer,)
     name = db.Column(db.String(100))
     connected = db.Column(db.Boolean)
     function = db.Column(db.String(100))
@@ -209,9 +250,9 @@ def enviar_codigo(id,codigo):
                          socket.SOCK_DGRAM)  # UDP
     sock.bind(('', UDP_PORT))
     sock.settimeout(10)
-    sent = sock.sendto(codigo.encode(), (esp.ip, int(esp.ip2)))
 
     try:
+        sent = sock.sendto(codigo.encode(), (esp.ip, int(esp.ip2)))
         data, address = sock.recvfrom(4096)
         print(data)
         data = str(data.decode('UTF-8'))
@@ -219,6 +260,8 @@ def enviar_codigo(id,codigo):
             return 1
         elif data == "404":
             return 2
+        else:
+            return data
     except:
         print("Num achei nada")
         return 4
@@ -233,8 +276,9 @@ def enviar_codigo_temp(id,codigo,temp):
                          socket.SOCK_DGRAM)  # UDP
     sock.bind(('', UDP_PORT))
     sock.settimeout(10)
-    sent = sock.sendto((codigo+temp).encode(), (esp.ip, int(esp.ip2)))
+
     try:
+        sent = sock.sendto((codigo + temp).encode(), (esp.ip, int(esp.ip2)))
         data, address = sock.recvfrom(4096)
         print(data)
         data = str(data.decode('UTF-8'))
@@ -254,6 +298,7 @@ def enviar_codigo_temp(id,codigo,temp):
 
 def update_db_ok(id,codigo):
     client = clients.query.filter_by(id=id).first()
+    client.connected = 1
     if client.function == "Luz":
         if codigo == 10:
             client.action = 1
@@ -267,6 +312,7 @@ def update_db_ok(id,codigo):
 
 def update_db_value(id, codigo, value):
     client = clients.query.filter_by(id=id).first()
+    client.connected = 1
     if client.function == "Porta":
         if codigo == 22:
             client.value = int(value)
@@ -281,7 +327,10 @@ def update_db_value(id, codigo, value):
     db.session.commit()
     print("Salvo na DataBase")
 
-
+def update_db_off(id):
+    client = clients.query.filter_by(id=id).first()
+    client.connected = 0
+    db.session.commit()
 
 
 class Clients(Resource):
@@ -351,6 +400,7 @@ def show_one(client_id):
                 flash('temperr', 'error')
             elif msg == 4:
                 flash('Tente de novo.', 'error')
+                update_db_off(client_id)
             elif msg == 1:
                 update_db_ok(client_id,request.form['codigo'])
             else:
@@ -419,7 +469,10 @@ def update_new():
 
 if __name__ == "__main__":
     thread = check_thread()
-
     thread.start()
     thread.pause()
+
+    onoff = onoff_thread()
+    onoff.start()
+
     app.run(host='0.0.0.0',port=HTTP_PORT)
