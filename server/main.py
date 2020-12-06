@@ -258,7 +258,7 @@ def enviar_codigo(id,codigo):
     sock = socket.socket(socket.AF_INET,  # Internet
                          socket.SOCK_DGRAM)  # UDP
     sock.bind(('', UDP_PORT))
-    sock.settimeout(10)
+    sock.settimeout(2)
 
     try:
         sent = sock.sendto(codigo.encode(), (esp.ip, int(esp.ip2)))
@@ -284,7 +284,7 @@ def enviar_codigo_temp(id,codigo,temp):
     sock = socket.socket(socket.AF_INET,  # Internet
                          socket.SOCK_DGRAM)  # UDP
     sock.bind(('', UDP_PORT))
-    sock.settimeout(10)
+    sock.settimeout(2)
 
     try:
         sent = sock.sendto((codigo + temp).encode(), (esp.ip, int(esp.ip2)))
@@ -309,31 +309,48 @@ def update_db_ok(id,codigo):
     client = clients.query.filter_by(id=id).first()
     client.connected = 1
     if client.function == "Luz":
-        if codigo == 10:
+        print("Luz")
+        if codigo == "10":
+            print("10")
             client.action = 1
-        elif codigo == 11:
+            db.session.commit()
+        elif codigo == "11":
+            print("11")
             client.action = 0
+            db.session.commit()
     else:
-        if codigo == 31:
+        print("AT")
+        if codigo == "31":
+            print("31")
             client.action = 0
-    db.session.commit()
+            db.session.commit()
+
     print("Salvo na DataBase")
 
 def update_db_value(id, codigo, value):
     client = clients.query.filter_by(id=id).first()
     client.connected = 1
     if client.function == "Porta":
-        if codigo == 22:
+        print("Porta")
+        if codigo == "22":
+            print("22")
             client.value = int(value)
+            db.session.commit()
     else:
-        if codigo == 32:
+        print("Ar")
+        if codigo == "32":
+            print("32")
             client.value = int(value)
-        elif codigo == 33:
+            db.session.commit()
+        elif codigo == "33":
+            print("33")
             client.act_value = int(value)
-        elif codigo == 30:
+            db.session.commit()
+        elif codigo == "30":
+            print("30")
             client.action = 1
             client.act_value = int(value)
-    db.session.commit()
+            db.session.commit()
     print("Salvo na DataBase")
 
 def update_db_off(id):
