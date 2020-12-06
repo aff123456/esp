@@ -12,6 +12,8 @@ HTTP_PORT = 5000
 UDP_PORT = 5001
 UDP_PORT_BROAD = 5050
 
+communicating = 0
+
 my_ip = socket.gethostbyname(socket.getfqdn())
 
 ESP_ADR = ('192.168.0.10', 57683)
@@ -32,8 +34,14 @@ class onoff_thread (threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
+        global communicating
         while True:
+            while communicating:
+                print("Esperando botao")
+                time.sleep(1)
+            communicating = 1
             try:
+
                 ids = clients.query.order_by(clients.id).all()
                 if ids:
                     print("Checando conexão")
@@ -63,6 +71,7 @@ class onoff_thread (threading.Thread):
                         print("Conectado, valor:" +msg)
             except:
                 print("Falha na checagem")
+            communicating = 0
             time.sleep(10)   # Tempo entre cada check
 
 
@@ -385,6 +394,11 @@ def show_one(client_id):
             db.session.commit()
             return redirect(url_for('index'))
         elif request.form['button'] == "funcao":
+            global communicating
+            while communicating:
+                print("Esperando thread")
+                time.sleep(0.1)
+            communicating = 1
             if request.form['codigo'] == "30" or request.form['codigo'] == "33":
                 print(request.form['codigo']+request.form['temp'])
                 msg = enviar_codigo_temp(client_id,request.form['codigo'],request.form['temp'])
@@ -405,6 +419,7 @@ def show_one(client_id):
                 update_db_ok(client_id,request.form['codigo'])
             else:
                 update_db_value(client_id, request.form['codigo'],msg)
+            communicating = 0
 
     return render_template('show_one.html', client = clients.query.filter_by(id=client_id).first(), clients = clients.query.order_by(clients.id).all())
 
