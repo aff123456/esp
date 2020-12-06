@@ -7,8 +7,9 @@ import socket
 import time
 import json
 
-HTTP_PORT = 5000
-UDP_PORT = 5001
+HTTP_PORT = 5001
+UDP_PORT = 5005
+UDP_PORT_BROAD = 5051
 
 my_ip = socket.gethostbyname(socket.getfqdn())
 
@@ -41,7 +42,7 @@ class check_thread(threading.Thread):
 
         sock = socket.socket(socket.AF_INET,  # Internet
                              socket.SOCK_DGRAM)  # UDP
-        sock.bind(('', 5050))
+        sock.bind(('', UDP_PORT_BROAD))
         response = 'pfg_ip_response_serv'
         sock.settimeout(10)
 
@@ -238,14 +239,49 @@ def enviar_codigo_temp(id,codigo,temp):
         print(data)
         data = str(data.decode('UTF-8'))
         if data == "OK":
-            return 1
+            return temp
         elif data == "404":
             return 2
         elif data == "tempErr":
             return 3
+        else:
+            return data
+
     except:
         print("Num achei nada")
         return 4
+
+
+def update_db_ok(id,codigo):
+    client = clients.query.filter_by(id=id).first()
+    if client.function == "Luz":
+        if codigo == 10:
+            client.action = 1
+        elif codigo == 11:
+            client.action = 0
+    else:
+        if codigo == 31:
+            client.action = 0
+    db.session.commit()
+    print("Salvo na DataBase")
+
+def update_db_value(id, codigo, value):
+    client = clients.query.filter_by(id=id).first()
+    if client.function == "Porta":
+        if codigo == 22:
+            client.value = int(value)
+    else:
+        if codigo == 32:
+            client.value = int(value)
+        elif codigo == 33:
+            client.act_value = int(value)
+        elif codigo == 30:
+            client.action = 1
+            client.act_value = int(value)
+    db.session.commit()
+    print("Salvo na DataBase")
+
+
 
 
 class Clients(Resource):
@@ -307,27 +343,19 @@ def show_one(client_id):
                 # Salvar dados modificados na DB
             else:
                 print(request.form['codigo'])
-                msg  = enviar_codigo(client_id, request.form['codigo'])
+                msg = enviar_codigo(client_id, request.form['codigo'])
+
             if msg == 2:
                 flash('404', 'error')
             elif msg == 3:
                 flash('temperr', 'error')
             elif msg == 4:
                 flash('Tente de novo.', 'error')
-            # Salvar dados modificados na DB
-
-        else:
-            if not request.form['codigo']:
-                flash('Digite um código.', 'error')
+            elif msg == 1:
+                update_db_ok(client_id,request.form['codigo'])
             else:
+                update_db_value(client_id, request.form['codigo'],msg)
 
-                codigo = request.form['codigo']
-                sock = socket.socket(socket.AF_INET,  # Internet
-                                     socket.SOCK_DGRAM)  # UDP
-
-                sent = sock.sendto(codigo.encode(), (request.form['ip'], int(request.form['ip2'])))
-
-                flash('Código enviado.')
     return render_template('show_one.html', client = clients.query.filter_by(id=client_id).first(), clients = clients.query.order_by(clients.id).all())
 
 @app.route('/new_client/', methods = ['GET', 'POST'])
