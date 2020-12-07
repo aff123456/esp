@@ -68,7 +68,7 @@ class onoff_thread (threading.Thread):
             except:
                 print("Falha na checagem")
             communicating = 0
-            time.sleep(10)   # Tempo entre cada check
+            time.sleep(1000)   # Tempo entre cada check
 
 
 class check_thread(threading.Thread):
@@ -123,6 +123,7 @@ class check_thread(threading.Thread):
                         print('Client already on the list')
             except:
                 print("Num achei nada")
+            #time.sleep(0.5)  # Tempo entre cada check
 
             if not self.__flag.isSet():
                 print('UDP Socket stopped searching')
@@ -326,18 +327,18 @@ def update_db_value(id, codigo, value):
     client.connected = 1
     if client.function == "Porta":
         print("Porta")
-        if codigo == 22:
+        if codigo == "22":
             print("22")
             client.value = int(value)
     else:
         print("Ar")
-        if codigo == 32:
+        if codigo == "32":
             print("32")
             client.value = int(value)
-        elif codigo == 33:
+        elif codigo == "33":
             print("33")
             client.act_value = int(value)
-        elif codigo == 30:
+        elif codigo == "30":
             print("30")
             client.action = 1
             client.act_value = int(value)
