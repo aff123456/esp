@@ -7,7 +7,7 @@ data = [{"name": "Esp_Luz", "ip": "1231331231", "ip2": 1233211, "connected": 1, 
         {"name": "Esp_Ar", "ip": "12311112331", "ip2": 13123, "connected": 1, "function":"Ar","value": 16, "action": 1, "act_value": 16}]
 
 for i in range(len(data)):
-    response = requests.put(BASE + "client/" + str(i), data[i])
+    response = requests.put(BASE + "client/" + str(i+45), data[i])
     print(response.json())
 
 

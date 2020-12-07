@@ -68,7 +68,7 @@ class onoff_thread (threading.Thread):
             except:
                 print("Falha na checagem")
             communicating = 0
-            time.sleep(1000)   # Tempo entre cada check
+            time.sleep(10)   # Tempo entre cada check
 
 
 class check_thread(threading.Thread):
@@ -123,7 +123,7 @@ class check_thread(threading.Thread):
                         print('Client already on the list')
             except:
                 print("Num achei nada")
-            #time.sleep(0.5)  # Tempo entre cada check
+            time.sleep(1)  # Tempo entre cada check
 
             if not self.__flag.isSet():
                 print('UDP Socket stopped searching')
