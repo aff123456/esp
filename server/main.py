@@ -1,8 +1,7 @@
 from flask import Flask, request, flash, url_for, redirect, render_template, jsonify
 from flask_restful import Api, Resource, reqparse, abort, fields, marshal_with
-from flask_sqlalchemy import SQLAlchemy, BaseQuery
-from sqlalchemy.orm import load_only
-from flask_socketio import SocketIO, emit
+from flask_sqlalchemy import SQLAlchemy
+from flask_socketio import SocketIO
 import threading
 import socket
 import time
@@ -16,8 +15,6 @@ communicating = 0
 
 my_ip = socket.gethostbyname(socket.getfqdn())
 
-ESP_ADR = ('192.168.0.10', 57683)
-
 
 app = Flask(__name__)
 api = Api(app)
@@ -26,7 +23,6 @@ db = SQLAlchemy(app)
 
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
-
 
 
 class onoff_thread (threading.Thread):
