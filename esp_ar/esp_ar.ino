@@ -272,11 +272,6 @@ void atuar(bool sinal) {
 void send(String mensagem) {
   Serial.print("Retorno enviado: ");
   Serial.println(mensagem);
-
-  udp.beginPacket(broadcastIP, port);     // manda um pacote broadcast (mandar pacote para o ip 255.255.255.255)
-  udp.print(mensagem);                    // conteúdo do pacote
-  int test = udp.endPacket();             // pacote terminou de enviar
-  
   udp.beginPacket(serverIP, port);
   udp.print(mensagem);
   if(udp.endPacket() != 1) {
