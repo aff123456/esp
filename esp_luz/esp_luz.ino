@@ -38,6 +38,7 @@ void setup() {
   Serial.println();       // print de uma linha em branco
 
   udp.begin(port);        // iniciliza comunicação udp na porta
+  udp.begin(port_broad);
 
   pinMode(luz_1,OUTPUT);
   //pinMode(luz_2,OUTPUT);

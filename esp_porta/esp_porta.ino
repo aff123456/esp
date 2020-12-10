@@ -39,6 +39,7 @@ void setup() {
   Serial.println();       // print de uma linha em branco
 
   udp.begin(port);        // iniciliza comunicação udp na porta
+  udp.begin(port_broad);
 
   pinMode(porta,INPUT);   // inicializa o pino escolhido como entrada
   pinMode(high,OUTPUT);
@@ -68,8 +69,6 @@ void setup() {
     delay(2500);            // espera pra uma nova tentativa
   }
   Serial.println("Servidor conectado, ip: " + serverIP.toString()); // print do ip do servidor no monitor serial
-
-  
 }
 
 // setup sem autoconnect
